@@ -14,21 +14,36 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(pacman, dplyr, GGally, ggplot2, ggthemes, 
                ggvis, httr, lubridate, plotly, rio, rmarkdown, shiny, 
                stringr, tidyr) 
+# Clear the environment
+rm(list=ls())
 
+library(tidyverse)
 
 # IMPORTING THE DATASET WITH RIO ##########################
-
 # CSV
 pizza_csv <- import("~/Desktop/pizza_restaurants.csv")
 head(pizza_csv)
 
+#Import the .csv file
+data_in <- "~/Documents/CEU/Courses/2020_Fall/Mandatory/DA1/Task2/DA1_Task_2/"
+pizza_csv <- read.csv(paste0(data_in,"raw/pizza_restaurants.csv"))
 
-# DATA VIEWER ##############################################
 
-?View
+
+#We take a look how our table looks like
 View(pizza_csv)
 
-glimpse(pizza_dataset)
+head(pizza_csv)
+glimpse(pizza_csv)
+
+
+#Few column names should be modified according to naming conventions
+
+
+
+
+
+
 
 summary(pizza_dataset$`Margherita Price (HUF)`)
 # Create descriptive table
@@ -45,8 +60,7 @@ vienna_sum_stat
 summary(pizza_dataset$`0.5L Cola Price (HUF)`)
 # Clone the dataset and assign it to a variable
 
-pizza_dataset <- pizza_csv
-head(pizza_dataset)
+
 
 
 # Plot Pizza Price vs. Beverage Price
