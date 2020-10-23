@@ -29,15 +29,31 @@ data_in <- "~/Documents/CEU/Courses/2020_Fall/Mandatory/DA1/Task2/DA1_Task_2/"
 pizza_csv <- read.csv(paste0(data_in,"raw/pizza_restaurants.csv"))
 
 
-
 #We take a look how our table looks like
 View(pizza_csv)
-
 head(pizza_csv)
 glimpse(pizza_csv)
 
+# It seems some columns do not contain numeric values, we should check that:
+typeof(pizza_csv$Margherita.Price..HUF.)
+typeof(pizza_csv$X0.5L.Cola.Price..HUF.)
+typeof(pizza_csv$Online.rating)
+typeof(pizza_csv$Pizza.only..binary.)
+typeof(pizza_csv$Distance.to.CEU..KM.)
 
-#Few column names should be modified according to naming conventions
+
+# Column names are not align with naming conventions
+pizza_csv <- rename(pizza_csv,
+                 margherita_price = Margherita.Price..HUF.,
+                 pizza_only = Pizza.only..binary.
+                 cola_price = X0.5L.Cola.Price..HUF.,
+                 online_rating = Online.rating,
+                 distance = Distance.to.CEU..KM)
+
+#As it turned out, Online rating and Distance to CEU are character types, need to replace , with .
+
+pizza_csv$Online.rating <- as.integer(pizza_csv$Online.rating)
+
 
 
 
