@@ -16,61 +16,64 @@ pacman::p_load(pacman, dplyr, GGally, ggplot2, ggthemes,
                ggvis, httr, lubridate, plotly, rio, rmarkdown, shiny, 
                stringr, tidyr) 
 
-
 library(tidyverse)
 library(xtable)
 
+
 # IMPORTING THE DATASET WITH RIO ##########################
 # CSV
-rest_data <- import("~/raw/pizza_restaurants_raw.csv")
+rest_data <- import("~/Desktop/Coding_1_R/pizza_restaurants/DA1_Task_2/raw/pizza_restaurants_raw.csv")
 head(rest_data)
 
-#Import the .csv file
-data_in <- "~/Documents/CEU/Courses/2020_Fall/Mandatory/DA1/Task2/DA1_Task_2/"
+#IMPORTING THE CSV FILE (ALTERNATIVELY)
+data_in <- "~/Desktop/Coding_1_R/pizza_restaurants/DA1_Task_2/"
 rest_data <- read.csv(paste0(data_in,"raw/pizza_restaurants_raw.csv"))
 
 
-#We take a look how our table looks like
+# DATA VIEWER ############################################
 View(rest_data)
 
-# Column names are not align with naming conventions
+
+#CHANGE NAMING CONVENTION OF COLUMNS
 rest_data <- rename(rest_data,
-                    margherita_price = Margherita.Price..HUF.,
-                    pizza_only = Pizza.only..binary.,
-                    cola_price = X0.5L.Cola.Price..HUF.,
-                    online_rating = Online.rating,
-                    distance = Distance.to.CEU..KM.)
+                    margherita_price = `Margherita Price (HUF)`,
+                    pizza_only = `Pizza only (binary)`,
+                    cola_price = `0.5L Cola Price (HUF)`,
+                    online_rating = `Online rating`,
+                    distance = `Distance to CEU (KM)`)
 
 
+# CHECK VARIABLE DATA TYPES #############################
 # It seems some columns do not contain numeric values, we should check that:
-typeof(rest_data$Margherita.Price..HUF.)
-typeof(rest_data$X0.5L.Cola.Price..HUF.)
-typeof(rest_data$Online.rating)
-typeof(rest_data$Pizza.only..binary.)
-typeof(rest_data$Distance.to.CEU..KM.)
+typeof(rest_data$margherita_price)
+typeof(rest_data$cola_price)
+typeof(rest_data$online_rating)
+typeof(rest_data$pizza_only)
+typeof(rest_data$distance)
 
 
-## Change data type and remove commas
-rest_data$online_rating <- as.double(gsub(",", ".", gsub("\\.", "", rest_data$online_rating)))
+# CHANGE VARIABLE DATA TYPE
+# REPLACE THE COMMA SEPERATOR WITH POINT
+rest_data$online_rating <- as.double(gsub(",", ".", gsub("\\.", "", rest_data$online_rating))) 
 rest_data$distance <- as.double(gsub(",", ".", gsub("\\.", "", rest_data$distance)))
            
-## Dropping NAs from cola_price column
+## FILTER MISSING VALUES FROM THE cola_price COLUMN
 cola_price <- filter(rest_data,!is.na(cola_price))
 
-
+# DATA VIEWER
 View(cola_price)
 
 
+# COMPUTER BASIC STATISTICS FOR 'margherita_price'
+summary(cola_price$margherita_price)
 
-summary(cola_price$`Margherita Price (HUF)`)
-# Create descriptive table
-rests_stat <- summarise( cola_price , 
-                              mean = mean( cola_price$`Margherita Price (HUF)` ),
-                              median = median( cola_price$`Margherita Price (HUF)` ),
-                              std = sd( cola_price$`Margherita Price (HUF)` ),
-                              min = min( cola_price$`Margherita Price (HUF)` ),
-                              max = max( cola_price$`Margherita Price (HUF)` ) )
-
+# COMPUTE SUMMARY STATISTICS FOR 'margherita_price'
+rests_stat <- summarize( cola_price , 
+                              mean = mean(cola_price$margherita_price),
+                              median = median( cola_price$margherita_price ),
+                              std = sd( cola_price$margherita_price ),
+                              min = min( cola_price$margherita_price ),
+                              max = max( cola_price$margherita_price ) )
 
 
 #Check basic stats for cola prices in the dataset
@@ -119,7 +122,6 @@ plot(pizza_price)                 # Default X-Y plot (lines)
 
 
 
-
 # BASIC HISTOGRAMS #########################################
 
 cola-price-histogram
@@ -131,6 +133,8 @@ cola_price %>%
    labs(x='Price', y='Count', title = 'Cola price distribution')
 
  master
+ 
+ 
 
 # HISTOGRAM BY GROUP #######################################
 
@@ -151,6 +155,7 @@ hist(cola_price$`0.5L Cola Price (HUF)` (HUF)` [cola_price$Region == "Capital"],
      main = "Distribution of the pizza price in the capital",
      xlab = "",
      col = "blue")
+
 
 
 # PLOTS ####################################################
@@ -174,6 +179,9 @@ plot(cola_price$`0.5L Cola Price (HUF)`, cola_price$`Margherita Price (HUF)`,
 
 # Restore graphic parameter
 par(mfrow=c(1, 1))
+
+
+
 
 
 # HISTOGRAM ################################################
@@ -203,6 +211,9 @@ lines(density(cola_price$`Margherita Price (HUF)`, adjust = 3), col = "purple", 
 rug(cola_price$`Margherita Price (HUF)`, lwd = 2, col = "gray")
 
 
+
+
+
 # SUMMARY() ################################################
 
 summary(cola_price$`Online rating`)       # Categorical variable
@@ -215,6 +226,10 @@ pacman::p_load(pacman, psych)
 # Get info on package
 p_help(psych)           # Opens package PDF in browser
 p_help(psych, web = F)  # Opens help in R Viewer
+
+
+
+
 
 # DESCRIBE() ###############################################
 
@@ -238,22 +253,21 @@ hist(cola_price[cola_price$Region == "Countryside"],
 
 
 
-
 # CLEAN UP #################################################
 
 # Clear environment
 rm(list = ls()) 
 
-# Clear packages
-p_unload(all)  # Remove all add-ons
+# Clear packages and ad-ons
+p_unload(all) 
 
 
 # Clear packages
 detach("package:datasets", unload = TRUE) #For base
 
 # Clear plots
-dev.off()  # But only if there IS a plot
+dev.off()
 
 # Clear console
-cat("\014")  # ctrl+L
+cat("\014")
 
