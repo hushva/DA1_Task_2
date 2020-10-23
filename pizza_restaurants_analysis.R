@@ -25,7 +25,7 @@ library(xtable)
 rest_data <- import("~/Desktop/Coding_1_R/pizza_restaurants/DA1_Task_2/raw/pizza_restaurants_raw.csv")
 head(rest_data)
 
-#IMPORTING THE CSV FILE (ALTERNATIVELY)
+# IMPORTING THE CSV FILE (ALTERNATIVELY)
 data_in <- "~/Desktop/Coding_1_R/pizza_restaurants/DA1_Task_2/"
 rest_data <- read.csv(paste0(data_in,"raw/pizza_restaurants_raw.csv"))
 
@@ -34,7 +34,7 @@ rest_data <- read.csv(paste0(data_in,"raw/pizza_restaurants_raw.csv"))
 View(rest_data)
 
 
-#CHANGE NAMING CONVENTION OF COLUMNS
+# CHANGE NAMING CONVENTION OF COLUMNS
 rest_data <- rename(rest_data,
                     margherita_price = `Margherita Price (HUF)`,
                     pizza_only = `Pizza only (binary)`,
@@ -68,7 +68,7 @@ View(cola_price)
 summary(cola_price$margherita_price)
 
 # COMPUTE SUMMARY STATISTICS FOR 'margherita_price'
-rest_summarystats <- 
+rest_summary <- 
    cola_price %>% 
    summarise( mean = mean( margherita_price ),
               median = median( margherita_price ),
@@ -99,16 +99,26 @@ cola_summarystats <-
 
  master
 
+ 
+ 
 # format the table and print
-xt<-xtable(cola_summarystats,caption = "Summary table 2",align='llccccccc', digits = c(2,0,2,0,0,0,0,3,0))
-names(xt) <- c('Mean','Median','Std.dev.','Min','Max','IQ range','Skewness', 'Observations' )
-print(xt, type = "latex", comment = getOption("xtable.comment", FALSE))
+xt_cola <- xtable(cola_summarystats,caption = "Summary Table: Cola Prices",align='llccccccc', digits = c(2,0,2,0,0,0,0,3,0))
+names(xt_cola) <- c('Mean','Median','Std.dev.','Min','Max','IQ range','Skewness', 'Observations' )
+print(xt_cola, type = "latex", comment = getOption("xtable.comment", FALSE))
 
+
+xt_pizza <- xtable(rest_summary,caption = "Summary Table: Margherita Prices",align='llccccccc', digits = c(2,0,2,0,0,0,0,3,0))
+names(xt_pizza) <- c('Mean','Median','Std.dev.','Min','Max','IQ range','Skewness', 'Observations' )
+print(xt_pizza, type = "latex", comment = getOption("xtable.comment", FALSE))
+
+
+
+# PLOTS #######################################
 
 
 # Plot Pizza Price vs. Beverage Price
 
-plot(cola_price$`Margherita Price (HUF)`, cola_price$`0.5L Cola Price (HUF)`,
+plot(cola_price$margherita_price , cola_price
      col = "#cc0000",  # Hex code for red
      pch = 19,         # Solid points
      main = "Pizza Restaurants: Prices of Pizza Vs. Price of Beverage",
@@ -184,9 +194,6 @@ plot(cola_price$`0.5L Cola Price (HUF)`, cola_price$`Margherita Price (HUF)`,
 par(mfrow=c(1, 1))
 
 
-
-
-
 # HISTOGRAM ################################################
 
 # Default
@@ -212,7 +219,6 @@ lines(density(cola_price$`Margherita Price (HUF)`, adjust = 3), col = "purple", 
 
 # Add a rug plot
 rug(cola_price$`Margherita Price (HUF)`, lwd = 2, col = "gray")
-
 
 
 
@@ -251,6 +257,8 @@ hist(cola_price$`Margherita Price (HUF)`[cola_price$Region == "Capital"],
 # Price of pizza in the countryside
 hist(cola_price[cola_price$Region == "Countryside"],
      main = "Price of pizza in the countryside")
+
+
 
 
 
