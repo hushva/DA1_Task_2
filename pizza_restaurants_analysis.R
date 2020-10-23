@@ -14,7 +14,7 @@ if (!require("pacman")) install.packages("pacman")
 # Use pacman to load add-on packages as desired
 pacman::p_load(pacman, dplyr, GGally, ggplot2, ggthemes, 
                ggvis, httr, lubridate, plotly, rio, rmarkdown, shiny, 
-               stringr, tidyr) 
+               stringr, tidyr, moments) 
 
 library(tidyverse)
 library(xtable)
@@ -68,18 +68,22 @@ View(cola_price)
 summary(cola_price$margherita_price)
 
 # COMPUTE SUMMARY STATISTICS FOR 'margherita_price'
-rests_stat <- summarize( cola_price , 
-                              mean = mean(cola_price$margherita_price),
-                              median = median( cola_price$margherita_price ),
-                              std = sd( cola_price$margherita_price ),
-                              min = min( cola_price$margherita_price ),
-                              max = max( cola_price$margherita_price ) )
+rest_summarystats <- 
+   cola_price %>% 
+   summarise( mean = mean( margherita_price ),
+              median = median( margherita_price ),
+              sd = sd( margherita_price  ),
+              min = min( margherita_price ),
+              max = max( margherita_price ),
+              iq_range = IQR( margherita_price ),
+              skew = skewness(margherita_price), # skewness function using moments package
+              numObs = sum( !is.na( margherita_price )))
 
 
-#Check basic stats for cola prices in the dataset
+# COMPUTE BASIC STATISTICS FOR 'cola price'
 summary(cola_price$cola_price )
 
-# Create descriptive table
+# COMPUTE SUMMARY STATISTICS FOR 'cola_price'
 cola-price-histogram
 cola_summarystats <- 
    cola_price %>% 
@@ -91,7 +95,6 @@ cola_summarystats <-
             iq_range = IQR( cola_price ),
             skew = ((mean(cola_price)-median(cola_price))/sd(cola_price)),
             numObs = sum( !is.na( cola_price )) )
-
 
 
  master
