@@ -48,16 +48,15 @@ typeof(rest_data$Pizza.only..binary.)
 typeof(rest_data$Distance.to.CEU..KM.)
 
 
+## Change data type and remove commas
+rest_data$online_rating <- as.double(gsub(",", ".", gsub("\\.", "", rest_data$online_rating)))
+rest_data$distance <- as.double(gsub(",", ".", gsub("\\.", "", rest_data$distance)))
+           
+## Dropping NAs from cola_price column
+cola_price <- filter(rest_data,!is.na(cola_price))
 
 
-View(rest_data)
-
-colnames(rest_data)[9] <- "Distance"
-#As it turned out, Online rating and Distance to CEU are character types, need to replace , with .
-
-rest_data$Online.rating <- as.integer(rest_data$Online.rating)
-
-
+View(cola_price)
 
 
 
