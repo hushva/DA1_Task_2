@@ -70,10 +70,16 @@ rests_stat <- summarise( pizza_dataset ,
                               max = max( pizza_dataset$`Margherita Price (HUF)` ) )
 
 
-vienna_sum_stat
 
-summary(pizza_dataset$`0.5L Cola Price (HUF)`)
-# Clone the dataset and assign it to a variable
+
+summary(cola_price$cola_price )
+# Create descriptive table
+cola_stats <- summarise( cola_price , 
+                         mean = mean(cola_price$cola_price ),
+                         median = median( cola_price$cola_price  ),
+                         std = sd( cola_price$cola_price  ),
+                         min = min( cola_price$cola_price  ),
+                         max = max( cola_price$cola_price  ) )
 
 
 
