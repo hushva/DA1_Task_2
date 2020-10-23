@@ -77,6 +77,7 @@ rests_stat <- summarise( cola_price ,
 summary(cola_price$cola_price )
 
 # Create descriptive table
+cola-price-histogram
 cola_summarystats <- 
    cola_price %>% 
    summarise( mean = mean( cola_price ),
@@ -88,6 +89,9 @@ cola_summarystats <-
             skew = ((mean(cola_price)-median(cola_price))/sd(cola_price)),
             numObs = sum( !is.na( cola_price )) )
 
+
+
+ master
 
 # format the table and print
 xt<-xtable(cola_summarystats,caption = "Summary table 2",align='llccccccc', digits = c(2,0,2,0,0,0,0,3,0))
@@ -118,12 +122,15 @@ plot(pizza_price)                 # Default X-Y plot (lines)
 
 # BASIC HISTOGRAMS #########################################
 
+cola-price-histogram
 ##Histogram for cola prices
 cola_price %>% 
    ggplot(aes(x=cola_price)) +
    geom_histogram()+ 
    theme_gray()+
    labs(x='Price', y='Count', title = 'Cola price distribution')
+
+ master
 
 # HISTOGRAM BY GROUP #######################################
 
