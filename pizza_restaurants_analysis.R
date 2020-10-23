@@ -5,7 +5,6 @@
 
 # INSTALL AND LOAD PACKAGES ################################
 
-library(datasets)  # Load base packages manually
 
 # Installs pacman ("package manager") if needed
 if (!require("pacman")) install.packages("pacman")
@@ -21,39 +20,42 @@ library(tidyverse)
 
 # IMPORTING THE DATASET WITH RIO ##########################
 # CSV
-pizza_csv <- import("~/Desktop/pizza_restaurants.csv")
-head(pizza_csv)
+rest_data <- import("~/raw/pizza_restaurants_raw.csv")
+head(rest_data)
 
 #Import the .csv file
 data_in <- "~/Documents/CEU/Courses/2020_Fall/Mandatory/DA1/Task2/DA1_Task_2/"
-pizza_csv <- read.csv(paste0(data_in,"raw/pizza_restaurants.csv"))
+rest_data <- read.csv(paste0(data_in,"raw/pizza_restaurants_raw.csv"))
 
 
 #We take a look how our table looks like
-View(pizza_csv)
-head(pizza_csv)
-glimpse(pizza_csv)
-
-# It seems some columns do not contain numeric values, we should check that:
-typeof(pizza_csv$Margherita.Price..HUF.)
-typeof(pizza_csv$X0.5L.Cola.Price..HUF.)
-typeof(pizza_csv$Online.rating)
-typeof(pizza_csv$Pizza.only..binary.)
-typeof(pizza_csv$Distance.to.CEU..KM.)
-
+View(rest_data)
 
 # Column names are not align with naming conventions
-pizza_csv <- rename(pizza_csv,
-                 margherita_price = Margherita.Price..HUF.,
-                 pizza_only = Pizza.only..binary.
-                 cola_price = X0.5L.Cola.Price..HUF.,
-                 online_rating = Online.rating,
-                 distance = Distance.to.CEU..KM)
+rest_data <- rename(rest_data,
+                    margherita_price = Margherita.Price..HUF.,
+                    pizza_only = Pizza.only..binary.,
+                    cola_price = X0.5L.Cola.Price..HUF.,
+                    online_rating = Online.rating,
+                    distance = Distance.to.CEU..KM.)
 
+
+# It seems some columns do not contain numeric values, we should check that:
+typeof(rest_data$Margherita.Price..HUF.)
+typeof(rest_data$X0.5L.Cola.Price..HUF.)
+typeof(rest_data$Online.rating)
+typeof(rest_data$Pizza.only..binary.)
+typeof(rest_data$Distance.to.CEU..KM.)
+
+
+
+
+View(rest_data)
+
+colnames(rest_data)[9] <- "Distance"
 #As it turned out, Online rating and Distance to CEU are character types, need to replace , with .
 
-pizza_csv$Online.rating <- as.integer(pizza_csv$Online.rating)
-
+rest_data$Online.rating <- as.integer(rest_data$Online.rating)
 
 
 
