@@ -5,6 +5,8 @@
 
 # INSTALL AND LOAD PACKAGES ################################
 
+# Clear the environment
+rm(list=ls())
 
 # Installs pacman ("package manager") if needed
 if (!require("pacman")) install.packages("pacman")
@@ -13,10 +15,10 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(pacman, dplyr, GGally, ggplot2, ggthemes, 
                ggvis, httr, lubridate, plotly, rio, rmarkdown, shiny, 
                stringr, tidyr) 
-# Clear the environment
-rm(list=ls())
+
 
 library(tidyverse)
+library(xtable)
 
 # IMPORTING THE DATASET WITH RIO ##########################
 # CSV
@@ -75,15 +77,22 @@ rests_stat <- summarise( cola_price ,
 summary(cola_price$cola_price )
 
 # Create descriptive table
-cola_summarystats <- summarise( cola_price , 
-                         mean = mean(cola_price ),
-                         median = median( cola_price  ),
-                         std = sd( cola_price  ),
-                         min = min( cola_price  ),
-                         max = max( cola_price  ),
-                         iq_range = IQR(cola_price),
-                         numObs   = sum( !is.na( cola_price ) ) )
+cola_summarystats <- 
+   cola_price %>% 
+   summarise( mean = mean( cola_price ),
+            median = median( cola_price ),
+            sd = sd( cola_price  ),
+            min = min( cola_price ),
+            max = max( cola_price ),
+            iq_range = IQR( cola_price ),
+            skew = ((mean(cola_price)-median(cola_price))/sd(cola_price)),
+            numObs = sum( !is.na( cola_price )) )
 
+
+# format the table and print
+xt<-xtable(cola_summarystats,caption = "Summary table 2",align='llccccccc', digits = c(2,0,2,0,0,0,0,3,0))
+names(xt) <- c('Mean','Median','Std.dev.','Min','Max','IQ range','Skewness', 'Observations' )
+print(xt, type = "latex", comment = getOption("xtable.comment", FALSE))
 
 
 
@@ -109,6 +118,7 @@ plot(pizza_price)                 # Default X-Y plot (lines)
 
 # BASIC HISTOGRAMS #########################################
 
+##Histogram for cola prices
 cola_price %>% 
    ggplot(aes(x=cola_price)) +
    geom_histogram()+ 
