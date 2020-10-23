@@ -60,8 +60,6 @@ View(cola_price)
 
 
 
-
-
 summary(pizza_dataset$`Margherita Price (HUF)`)
 # Create descriptive table
 rests_stat <- summarise( pizza_dataset , 
