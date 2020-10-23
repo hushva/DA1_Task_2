@@ -5,17 +5,17 @@
 
 # INSTALL AND LOAD PACKAGES ################################
 
-# Clear the environment
+# CLEAR THE ENVIRONMENT
 rm(list=ls())
 
-# Installs pacman ("package manager") if needed
+# INSTALL pacman if needed
 if (!require("pacman")) install.packages("pacman")
 
-# Use pacman to load add-on packages as desired
+# USE pacman TO LOAD ADD-ON PACKAGES AS DESIRED
 pacman::p_load(pacman, dplyr, GGally, ggplot2, ggthemes, 
                ggvis, httr, lubridate, plotly, rio, rmarkdown, shiny, 
                stringr, tidyr, moments) 
-
+# CALL PACKAGES
 library(tidyverse)
 library(xtable)
 
@@ -57,7 +57,7 @@ typeof(rest_data$distance)
 rest_data$online_rating <- as.double(gsub(",", ".", gsub("\\.", "", rest_data$online_rating))) 
 rest_data$distance <- as.double(gsub(",", ".", gsub("\\.", "", rest_data$distance)))
            
-## FILTER MISSING VALUES FROM THE cola_price COLUMN
+## FILTER MISSING VALUES FROM THE "cola_price" COLUMN
 cola_price <- filter(rest_data,!is.na(cola_price))
 
 # DATA VIEWER
@@ -68,16 +68,15 @@ View(cola_price)
 summary(cola_price$margherita_price)
 
 # COMPUTE SUMMARY STATISTICS FOR 'margherita_price'
-rest_summary <- 
-   cola_price %>% 
-   summarise( mean = mean( margherita_price ),
-              median = median( margherita_price ),
-              sd = sd( margherita_price  ),
-              min = min( margherita_price ),
-              max = max( margherita_price ),
-              iq_range = IQR( margherita_price ),
-              skew = skewness(margherita_price), # skewness function using moments package
-              numObs = sum( !is.na( margherita_price )))
+rest_summary <- cola_price %>%  summarise( 
+      mean = mean( margherita_price ),
+      median = median( margherita_price ),
+      sd = sd( margherita_price  ),
+      min = min( margherita_price ),
+      max = max( margherita_price ),
+      iq_range = IQR( margherita_price ),
+      skew = skewness(margherita_price), # skewness function using moments package
+      numObs = sum( !is.na( margherita_price )))
 
 
 # COMPUTE BASIC STATISTICS FOR 'cola price'
@@ -85,20 +84,22 @@ summary(cola_price$cola_price )
 
 # COMPUTE SUMMARY STATISTICS FOR 'cola_price'
 cola-price-histogram
-cola_summarystats <- 
-   cola_price %>% 
-   summarise( mean = mean( cola_price ),
-            median = median( cola_price ),
-            sd = sd( cola_price  ),
-            min = min( cola_price ),
-            max = max( cola_price ),
-            iq_range = IQR( cola_price ),
-            skew = ((mean(cola_price)-median(cola_price))/sd(cola_price)),
-            numObs = sum( !is.na( cola_price )) )
-
+cola_summarystats <- cola_price %>% summarise( 
+      mean = mean( cola_price ),
+      median = median( cola_price ),
+      sd = sd( cola_price  ),
+      min = min( cola_price ),
+      max = max( cola_price ),
+      iq_range = IQR( cola_price ),
+      skew = ((mean(cola_price)-median(cola_price))/sd(cola_price)),
+      numObs = sum( !is.na( cola_price )) )
 
  master
 
+# JOIN SUMMARY STATISTICS TABLES FOR 'margherita_price' & 'cola_price' (NEED TO ADD ROW NAMES: pizza & cola)
+stat_table <- rest_summary %>% add_row( cola_summarystats )
+stat_table
+ 
  
  
 # format the table and print
@@ -112,25 +113,30 @@ names(xt_pizza) <- c('Mean','Median','Std.dev.','Min','Max','IQ range','Skewness
 print(xt_pizza, type = "latex", comment = getOption("xtable.comment", FALSE))
 
 
-
 # PLOTS #######################################
 
+# Separate plots for pizza prices based on region 
+ggplot(cola_price, aes(x = Region , y = margherita_price)) +
+   geom_point(position = position_jitter(0.2)) +
+   xlab("Region") + 
+   ylab("Margherita Pizza Price (HUF)")
 
-# Plot Pizza Price vs. Beverage Price
 
-plot(cola_price$margherita_price , cola_price
+# Plot Pizza Price vs. Cola Price
+plot(cola_price$margherita_price , cola_price$cola_price, 
      col = "#cc0000",  # Hex code for red
      pch = 19,         # Solid points
-     main = "Pizza Restaurants: Prices of Pizza Vs. Price of Beverage",
+     main = "Pizza Restaurants: Prices of Pizza Vs. Price of Cola",
      xlab = "Pizza Price (HUF)",
-     ylab = "Beverage Price (HUF)")
+     ylab = "Cola Price (HUF)")
+
+
 
 
 
 # Need a table with frequencies for each category
-pizza_price <- table(cola_price$`Margherita Price (HUF)`)  # Create table
+pizza_price <- table(cola_price$margherita_price)  # Create table
 barplot(pizza_price)              # Bar chart
-plot(pizza_price)                 # Default X-Y plot (lines)
 
 
 
@@ -143,8 +149,19 @@ cola_price %>%
    ggplot(aes(x=cola_price)) +
    geom_histogram()+ 
    theme_gray()+
-   labs(x='Price', y='Count', title = 'Cola price distribution')
+   labs(x='Price', y='Count', title = 'Cola Price Distribution')
 
+ master
+
+ 
+pizza_price-histogram
+##Histogram for pizza prices
+ cola_price %>% 
+    ggplot(aes(x = margherita_price)) +
+    geom_histogram()+ 
+    theme_gray()+
+    labs(x='Price', y='Count', title = 'Margherita Pizza Price Distribution')
+ 
  master
  
  
@@ -222,30 +239,8 @@ rug(cola_price$`Margherita Price (HUF)`, lwd = 2, col = "gray")
 
 
 
-
-# SUMMARY() ################################################
-
-summary(cola_price$`Online rating`)       # Categorical variable
-summary(cola_price$`Margherita Price (HUF)`)  # Quantitative variable
-summary(cola_price)               # Entire data frame
-
 # Use pacman to load add-on packages as desired
 pacman::p_load(pacman, psych) 
-
-# Get info on package
-p_help(psych)           # Opens package PDF in browser
-p_help(psych, web = F)  # Opens help in R Viewer
-
-
-
-
-
-# DESCRIBE() ###############################################
-
-# For quantitative variables only.
-
-describe(cola_price$`Margherita Price (HUF)`)  # One quantitative variable
-describe(cola_price)               # Entire data frame
 
 
 # SELECT BY CATEGORY #######################################
@@ -257,9 +252,6 @@ hist(cola_price$`Margherita Price (HUF)`[cola_price$Region == "Capital"],
 # Price of pizza in the countryside
 hist(cola_price[cola_price$Region == "Countryside"],
      main = "Price of pizza in the countryside")
-
-
-
 
 
 
