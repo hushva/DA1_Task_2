@@ -74,10 +74,6 @@ print(xt_pizza, type = "latex", comment = getOption("xtable.comment", FALSE))
 # JOIN SUMMARY STATISTICS TABLES FOR 'margherita_price' & 'cola_price'
 stat_table <- xt_pizza %>% add_row( xt_cola )
 stat_table
-
-
-
-
 ```
 
 # Table 1.1 Descriptive statistics for pizza and cola prices in Hungary 
@@ -87,29 +83,23 @@ library(knitr)
 kable(stat_table [1:2, ], caption = "Summmary Statistics for Margherita (1) and Cola (2)") 
 ```
 
-
 # Price Distributions 
 
-## Figure 1.1 Pizza and Cola Price Distributions 
-
-```{r, echo=FALSE, warning=F, message=F, warning=FALSE}
+```{r, echo=FALSE, warning=F, message=F, warning=FALSE, figures-side, fig.show="hold", out.width="50%"}
+par(mar = c(4, 4, .1, .1))
 f_rest_data %>%
   ggplot(aes(x=cola_price)) +
   geom_histogram()+
   theme_gray()+
-  labs(x= "Price", y= "Frequency", title = "Cola Price Distribution")
-```
+  labs(x= "Price", y= "Frequency", title = "Figure 1.1 Cola Price Distribution")
 
-## Figure 1.2 Pizza Price Distributions 
-
-```{r, echo=FALSE, warning=F, message=F, warning=FALSE}
+par(mar = c(4, 4, .1, .1))
 f_rest_data %>%
   ggplot(aes(x = margherita_price)) +
   geom_histogram()+
   theme_gray()+
-  labs(x= "Price", y="Frequency", title = "Margherita Pizza Price Distribution")
+  labs(x= "Price", y="Frequency", title = "Figure 1.2 Margherita Pizza Price Distribution")
 ```
-
 
 # Figure 2.1 Price Distributions Conditioned on Region 
 
@@ -136,28 +126,17 @@ testing <- f_rest_data %>%
              se_margherita_price =1/sqrt(n())*sd(margherita_price),
              num_obs=n())
  testing <- mutate(testing, t_stat=mean_margherita_price / se_margherita_price)
- 
  testing 
 ```
 
-# Table 2.1 
+# Table 2.1 Test Results 
 
 ```{r, echo=FALSE, warning=F, message=F, warning=FALSE}
 library(knitr)
-kable(testing [1:2, ], caption = "Test Results") 
+kable(testing [1:2, ], caption = "") 
 ```
-
 
 # Summary 
 
-## 3.1 Density plot for pizza and cola prices based on region
 
-```{r, echo=FALSE, warning=F, message=F, warning=FALSE}
-library(ggplot2)
- ggplot( data = f_rest_data ) +
-    geom_density( aes( x = margherita_price ) , color = "blue"  , alpha = 0.1 ) +
-    geom_density( aes( x = f_rest_data$cola_price )  , color = "red" , alpha = 0.1 ) +
-   labs(x = "Price in HUF",
-         y = "Relative Frequency" )
-```
-## Findings 
+
