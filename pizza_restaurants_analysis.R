@@ -26,8 +26,8 @@ rest_data <- import("~/Desktop/Coding_1_R/pizza_restaurants/DA1_Task_2/raw/pizza
 head(rest_data)
 
 # IMPORTING THE CSV FILE (ALTERNATIVELY)
-data_in <- "~/Desktop/Coding_1_R/pizza_restaurants/DA1_Task_2/"
-rest_data <- read.csv(paste0(data_in,"raw/pizza_restaurants_raw.csv"))
+data_in <- "C:/Users/ADMIN/Desktop/CEU/R_codes/DA1_Task_2/raw/"
+rest_data <- read.csv(paste0(data_in,"pizza_restaurants_raw.csv"))
 
 
 # DATA VIEWER ############################################
@@ -36,11 +36,11 @@ View(rest_data)
 
 # CHANGE NAMING CONVENTION OF COLUMNS
 rest_data <- rename(rest_data,
-                    margherita_price = `Margherita Price (HUF)`,
-                    pizza_only = `Pizza only (binary)`,
-                    cola_price = `0.5L Cola Price (HUF)`,
-                    online_rating = `Online rating`,
-                    distance = `Distance to CEU (KM)`)
+                    margherita_price = `Margherita.Price..HUF.`,
+                    pizza_only = `Pizza.only..binary.`,
+                    cola_price = `X0.5L.Cola.Price..HUF.`,
+                    online_rating = `Online.rating`,
+                    distance = `Distance.to.CEU..KM.`)
 
 
 # CHECK VARIABLE DATA TYPES #############################
@@ -255,6 +255,18 @@ ggplot(f_rest_data, aes(x = Region , y = cola_price)) +
     labs(x = "Price in HUF",
          y = "Relative Frequency" )
  
+ 
+#Multiple test to determine whether the marghertia pizza prices in the Capital are the same as in the Countryside
+testing <- f_rest_data %>% 
+   select(Region, margherita_price) %>% 
+   group_by(Region) %>% 
+   summarise(mean_margherita_price = mean(margherita_price),
+             se_margherita_price =1/sqrt(n())*sd(margherita_price),
+             num_obs=n())
+ testing <- mutate(testing, t_stat=mean_margherita_price / se_margherita_price)
+ 
+ #Check results of the multiple test
+ testing
 
 # CLEAN UP ###########################################
 
