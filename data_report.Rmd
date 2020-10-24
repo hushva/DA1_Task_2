@@ -1,16 +1,13 @@
 ---
-title: "Team C Data Report"
+title: "**Assignment**"
+author: "Team C"
+geiometry: "margin=2cm"
 output: pdf_document
 theme: cayman
 ---
+# Data Collection Process 
 
-# Owerview 
-
-## Data Collection Process 
-
-The data collection process took place in a primarily online setting. Main sources included searches through Google and NetPincer websites. The restaurants were selected in random fashion. Restaurants outside of Budapest, were selected from cities with the population ranging from 60 thousand to 200 thousand, in an attempt to increase coverage. The number of observations was limited to three to avoid bias. The cola beverage was chosen as a variable in order to avoid missing values. Due to high popularity, the assumption was that, Cola is available almost anywhere in some shape or form. In addition, no distinction was made between nominal brands of cola (e.g. Pepsi-Cola vs. Coca-Cola). In order to manage the geographic restrictions and the limited opening hours, a binary variable was selected. The variable measures if the observed restaurant serves pizza only or has additional items on the menu (e.g. pasta, soup, non-Italian cuisine, etc.). In case of further research, the variable can be used as a conditioning variable, to explore correlation between it and other variables. For example, it might provide some insight into the correlation between quality of pizza and the restaurant being a pizzeria only. 
-
-## Main Issues and Challenges 
+The data collection process took place in a primarily online setting. Main sources included searches through Google and NetPincer websites. The restaurants were selected in random fashion. Restaurants outside of Budapest, were selected from cities with the population ranging from 60 thousand to 200 thousand, in an attempt to increase coverage. The number of observations was limited to three to avoid bias. The cola beverage was chosen as a variable in order to avoid missing values. Due to high popularity, the assumption was that, Cola is available almost anywhere in some shape or form. In addition, no distinction was made between nominal brands of cola (e.g. Pepsi-Cola vs. Coca-Cola). In order to manage the geographic restrictions and the limited opening hours, a binary variable was selected. The variable measures if the observed restaurant serves pizza only or has additional items on the menu (e.g. pasta, soup, non-Italian cuisine, etc.). In case of further research, the variable can be used as a conditioning variable, to explore correlation between it and other variables. The main cahllenges faced during the collection of the data are listed below 
 
 * Some of the restaurants don’t have an online presence, which makes it harder to record observations and thus increases the chance of incomplete coverage. 
 * Most of the places don’t have a uniform menu features, meaning some of the places don’t indicate the pizza size while others don’t have cola on the menu. This resulted in missing values for some observations. 
@@ -76,7 +73,7 @@ stat_table <- xt_pizza %>% add_row( xt_cola )
 stat_table
 ```
 
-# Table 1.1 Descriptive statistics for pizza and cola prices in Hungary 
+# Descriptive Statistics for Margherita and Cola Prices in Hungary 
 
 ```{r, echo=FALSE, warning=F, message=F, warning=FALSE}
 library(knitr)
@@ -85,7 +82,7 @@ kable(stat_table [1:2, ], caption = "Summmary Statistics for Margherita (1) and 
 
 # Price Distributions 
 
-```{r, echo=FALSE, warning=F, message=F, warning=FALSE, figures-side, fig.show="hold", out.width="50%"}
+```{r, echo=FALSE, warning=F, message=F, warning=FALSE, figures-side, fig.show="hold", out.width="50%", fig.height=3}
 par(mar = c(4, 4, .1, .1))
 f_rest_data %>%
   ggplot(aes(x=cola_price)) +
@@ -107,14 +104,14 @@ f_rest_data %>%
 par(mfrow = c(3, 1)) 
 hist(f_rest_data$margherita_price [f_rest_data$Region == "Capital"],
       xlim = c(0, 2500),
-      main = "Distribution of Pizza Prices in the Capital",
-      xlab = "Price of Pizza in HUF",
+      main = "Distribution of Margherita Prices in the Capital",
+      xlab = "Price in HUF",
       col = "#83BFFF")
      
 hist(f_rest_data$margherita_price [f_rest_data$Region == "Countryside"],
        xlim = c(0, 2500),
-       main = "Distribution of Margherita prices in the Countryside",
-       xlab = 'Price of Pizza in HUF',
+       main = "Distribution of Margherita Prices in the Countryside",
+       xlab = 'Price in HUF',
        col = "#FF8784")
 ```
 
@@ -128,15 +125,17 @@ testing <- f_rest_data %>%
  testing <- mutate(testing, t_stat=mean_margherita_price / se_margherita_price)
  testing 
 ```
+\vspace*{-4cm}
+# Statistical Test Results 
 
-# Table 2.1 Test Results 
-
-```{r, echo=FALSE, warning=F, message=F, warning=FALSE}
+```{r, echo=FALSE, warning=F, message=F, fig.align="center",  fig.show="hold"}
 library(knitr)
-kable(testing [1:2, ], caption = "") 
+kable(testing [1:2, ], caption = "Test Results ") 
 ```
 
 # Summary 
+
+We could conclude based on the t-stats that the average price of margherita pizza in the capital and in the countryside is not the same. 
 
 
 
