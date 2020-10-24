@@ -98,10 +98,6 @@ cola_stat <- f_rest_data %>% summarise(
       numObs = sum( !is.na( cola_price )) )
 
  master
-
-# JOIN SUMMARY STATISTICS TABLES FOR 'margherita_price' & 'cola_price' (NEED TO ADD ROW NAMES: pizza & cola)
-stat_table <- rest_summary %>% add_row( cola_stat )
-stat_table
  
  
 # format the table and print
@@ -115,6 +111,12 @@ names(xt_pizza) <- c('Mean','Median','Std.dev.','Min','Max','IQ range','Skewness
 print(xt_pizza, type = "latex", comment = getOption("xtable.comment", FALSE))
 
 
+# JOIN SUMMARY STATISTICS TABLES FOR 'margherita_price' & 'cola_price'
+stat_table <- xt_pizza %>% add_row( xt_cola )
+stat_table
+
+
+
 # BASIC HISTOGRAMS #########################################
 
 # Put graphs in 2 rows and 1 column
@@ -123,45 +125,124 @@ par(mfrow = c(2, 1))
 cola-price-histogram
 ## Histogram for cola prices
 f_rest_data %>% 
-   ggplot(aes(x=cola_price)) +
-   geom_histogram()+ 
-   theme_gray()+
-   labs(x='Price', y='Frequency', title = 'Cola Price Distribution')
+  ggplot(aes(x=cola_price)) +
+  geom_histogram()+ 
+  theme_gray()+
+  labs(x='Price', y='Frequency', title = 'Cola Price Distribution')
 
- master
+master
 
 pizza_price-histogram
 ##Histogram for pizza prices
- f_rest_data %>% 
-    ggplot(aes(x = margherita_price)) +
-    geom_histogram()+ 
-    theme_gray()+
-    labs(x='Price', y='Frequency', title = 'Margherita Pizza Price Distribution')
- 
- master
+f_rest_data %>% 
+  ggplot(aes(x = margherita_price)) +
+  geom_histogram()+ 
+  theme_gray()+
+  labs(x='Price', y='Frequency', title = 'Margherita Pizza Price Distribution')
 
- # RESTORE GRAPHIC PARAMETER
+master
+
+
+# PLOTS ##############################################
+
+# Basic X-Y plot for pizza and cola price variables
+plot(f_rest_data$margherita_price , f_rest_data$cola_price, 
+     col = "#cc0000",  # Hex code for red
+     pch = 19,         # Solid points
+     main = "Pizza Restaurants: Prices of Pizza Vs. Price of Cola",
+     xlab = "Pizza Price (HUF)",
+     ylab = "Cola Price (HUF)")
+
+
+# PLot for pizza prices based on region 
+ggplot(f_rest_data, aes(x = Region , y = margherita_price)) +
+   geom_point(position = position_jitter(0.15)) +
+   xlab("Region") + 
+   ylab("Margherita Pizza Price (HUF)")
+
+# PLot for cola prices based on region
+ggplot(f_rest_data, aes(x = Region , y = cola_price)) +
+   geom_point(position = position_jitter(0.15)) +
+   xlab("Region") + 
+   ylab("Cola Price (HUF)")
+
+ 
+# HISTOGRAM BY GROUP (REGION = Capital) ################
+ 
+# Put graphs in 2 rows and 1 column
+ par(mfrow = c(2, 1))
+ 
+# Histogram for price of pizza in the capital
+ hist(f_rest_data$margherita_price [f_rest_data$Region == "Capital"],
+      xlim = c(0, 2500),
+      main = "Distribution of Pizza Prices in the Capital",
+      xlab = "Price of Pizza in HUF",
+      col = "#83BFFF")
+   
+   
+# Histogram for price of cola in the capital
+  hist(f_rest_data$cola_price [f_rest_data$Region == "Capital"],
+        xlim = c(0, 1500),
+        main = "Distribution of Beverage Prices in the Capital",
+        xlab = "Price of Cola in HUF",
+        col = "#FF8784")
+ 
+
+# HISTOGRAM BY GROUP (REGION = Countryside) ################
+  
+# Put graphs in 2 rows and 1 column
+  par(mfrow = c(2, 1))
+  
+# Histogram for price of pizza in the countryside
+  hist(f_rest_data$margherita_price [f_rest_data$Region == "Countryside"],
+       xlim = c(0, 2500),
+       main = "Distribution of Pizza Prices in the Countryside",
+       xlab = "Price of Pizza in HUF",
+       col = "#83BFFF")
+  
+  
+# Histogram for price of cola in the countrysude
+  hist(f_rest_data$cola_price [f_rest_data$Region == "Countryside"],
+       xlim = c(0, 1500),
+       main = "Distribution of Beverage Prices in the Countryside",
+       xlab = "Price of Cola in HUF",
+       col = "#FF8784")
+    
+ 
+# RESTORE GRAPHIC PARAMETER
  par(mfrow=c(1, 1))
  
  
- # HISTOGRAM BY GROUP #############################
+# HISTOGRAMS GROUPED BY REGION #################
  
- # Put graphs in 3 rows and 1 column
+# Put graphs in 3 rows and 1 column
  par(mfrow = c(3, 1))
  
- # Histogram
- # Margherita price based on region
+# Histogram
+# Margherita price based on region
  ggplot(data = f_rest_data , aes( x = margherita_price , fill = Region ) ) +
     geom_histogram( aes( y = ..density.. ), alpha =0.5 ) +
     labs( x = "Price" , y = 'Relative Frequency'  ,
           fill = 'Region' )
+
+ # Cola price based on region
+ ggplot(data = f_rest_data , aes( x = cola_price , fill = Region ) ) +
+   geom_histogram( aes( y = ..density.. ), alpha =0.5 ) +
+   labs( x = "Price" , y = 'Relative Frequency'  ,
+         fill = 'Region' ) 
  
- # BOX PLOT #####################################
- # Margherita price based on region
+  
+# BOX PLOT #####################################
+# Margherita price based on region
  ggplot(f_rest_data, aes(x = Region , y = margherita_price)) + 
     geom_boxplot(varwidth = T)
  
- # DENSITY PLOT #################################
+ # Cola price based on region
+ ggplot(f_rest_data, aes(x = Region , y = cola_price)) + 
+   geom_boxplot(varwidth = T)
+  
+ 
+ # DENSITY PLOT ###############################
  # Margherita price based on region
  ggplot(f_rest_data, aes(x = margherita_price , fill = Region)) + 
     geom_density(col = NA , alpha = 0.35) + 
@@ -174,65 +255,6 @@ pizza_price-histogram
     labs(x = "Price in HUF",
          y = "Relative Frequency" )
  
- 
- # RESTORE GRAPHIC PARAMETER
- par(mfrow=c(1, 1))
- 
- 
- # Price of pizza in the capital
- hist(cola_price$margherita_price[cola_price$Region == "Capital"],
-      main = "Pizza Prices in the capital")
- 
- # Price of pizza in the countryside
- hist(cola_price$margherita_price[cola_price$Region == "Countryside"],
-      main = "Price of pizza in the countryside")
- 
- 
- 
-# HISTOGRAM BY GROUP (REGION = Capital) ################
-
-# Put graphs in 2 rows and 1 column
-par(mfrow = c(2, 1))
-
-# Histogram for price of pizza in the capital
-hist(f_rest_data$margherita_price [f_rest_data$Region == "Capital"],
-     xlim = c(0, 2500),
-     main = "Distribution of Pizza Prices in the Capital",
-     xlab = "Price in HUF",
-     col = "#83BFFF") |+
-   
-
-# Histogram for price of cola in the capital
-hist(f_rest_data$cola_price [f_rest_data$Region == "Capital"],
-     xlim = c(0, 1500),
-     main = "Distribution of PBeverage Prices in the Capital",
-     xlab = "Price in HUF",
-     col = "#FF402F")
-
-
-
-# PLOTS ##############################################
-
-# Basic X-Y plot for pizza and cola price variables
-plot(cola_price$margherita_price , cola_price$cola_price, 
-     col = "#cc0000",  # Hex code for red
-     pch = 19,         # Solid points
-     main = "Pizza Restaurants: Prices of Pizza Vs. Price of Cola",
-     xlab = "Pizza Price (HUF)",
-     ylab = "Cola Price (HUF)")
-
-# PLot for pizza prices based on region 
-ggplot(cola_price, aes(x = Region , y = margherita_price)) +
-   geom_point(position = position_jitter(0.2)) +
-   xlab("Region") + 
-   ylab("Margherita Pizza Price (HUF)")
-
-
-ggplot(f_rest_data, aes(x = Region , y = margherita_price)) +
-   geom_point(position = position_jitter(0.2)) +
-   xlab("Region") + 
-   ylab("Margherita Pizza Price (HUF)")
-
 
 # CLEAN UP ###########################################
 
