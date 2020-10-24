@@ -2,7 +2,6 @@
 title: "Team C Data Report"
 output: pdf_document
 theme: cayman
-    highlight: github
 ---
 
 # Owerview 
