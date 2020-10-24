@@ -20,14 +20,15 @@ library(tidyverse)
 library(xtable)
 
 
+
 # IMPORTING THE DATASET WITH RIO ##########################
 # CSV
 rest_data <- import("~/Desktop/Coding_1_R/pizza_restaurants/DA1_Task_2/raw/pizza_restaurants_raw.csv")
 head(rest_data)
 
 # IMPORTING THE CSV FILE (ALTERNATIVELY)
-data_in <- "~/Desktop/Coding_1_R/pizza_restaurants/DA1_Task_2/"
-rest_data <- read.csv(paste0(data_in,"raw/pizza_restaurants_raw.csv"))
+data_in <- "C:/Users/ADMIN/Desktop/CEU/R_codes/Task2/"
+rest_data <- read.csv(paste0(data_in,"pizza_restaurants_raw.csv"))
 
 
 # DATA VIEWER ############################################
@@ -36,11 +37,11 @@ View(rest_data)
 
 # CHANGE NAMING CONVENTION OF COLUMNS
 rest_data <- rename(rest_data,
-                    margherita_price = `Margherita Price (HUF)`,
-                    pizza_only = `Pizza only (binary)`,
-                    cola_price = `0.5L Cola Price (HUF)`,
-                    online_rating = `Online rating`,
-                    distance = `Distance to CEU (KM)`)
+                    margherita_price = `Margherita.Price..HUF.`,
+                    pizza_only = `Pizza.only..binary.`,
+                    cola_price = `X0.5L.Cola.Price..HUF.`,
+                    online_rating = `Online.rating`,
+                    distance = `Distance.to.CEU..KM.`)
 
 
 # CHECK VARIABLE DATA TYPES #############################
@@ -83,7 +84,7 @@ rest_summary <- cola_price %>%  summarise(
 summary(cola_price$cola_price )
 
 # COMPUTE SUMMARY STATISTICS FOR 'cola_price'
-cola-price-histogram
+#cola-price-histogram
 cola_summarystats <- cola_price %>% summarise( 
       mean = mean( cola_price ),
       median = median( cola_price ),
@@ -94,7 +95,7 @@ cola_summarystats <- cola_price %>% summarise(
       skew = ((mean(cola_price)-median(cola_price))/sd(cola_price)),
       numObs = sum( !is.na( cola_price )) )
 
- master
+master
 
 # JOIN SUMMARY STATISTICS TABLES FOR 'margherita_price' & 'cola_price' (NEED TO ADD ROW NAMES: pizza & cola)
 stat_table <- rest_summary %>% add_row( cola_summarystats )
@@ -172,14 +173,14 @@ pizza_price-histogram
 par(mfrow = c(2, 1))
 
 # Histogram for price of pizza in the capital
-hist(cola_price$`Margherita Price (HUF)` [cola_price$Region == "Capital"],
+hist(cola_price$margherita_price [cola_price$Region == "Capital"],
      xlim = c(0, 2500),
      breaks = 27,
      main = "Distribution of the pizza price in the capital",
      xlab = "",
      col = "red")
 
-hist(cola_price$`0.5L Cola Price (HUF)` (HUF)` [cola_price$Region == "Capital"],
+hist(cola_price$cola_price [cola_price$Region == "Capital"],
      xlim = c(0, 1500),
      ##breaks = 27,
      main = "Distribution of the pizza price in the capital",
@@ -191,14 +192,14 @@ hist(cola_price$`0.5L Cola Price (HUF)` (HUF)` [cola_price$Region == "Capital"],
 # PLOTS ####################################################
 
 # Good to first check univariate distributions
-hist(cola_price$`Margherita Price (HUF)`)
-hist(cola_price$`0.5L Cola Price (HUF)`)
+hist(cola_price$margherita_price)
+hist(cola_price$cola_price)
 
 # Basic X-Y plot for two quantitative variables
-plot(cola_price$`0.5L Cola Price (HUF)`, cola_price$`Margherita Price (HUF)`)
+plot(cola_price$cola_price, cola_price$margherita_price)
 
 # Add some options
-plot(cola_price$`0.5L Cola Price (HUF)`, cola_price$`Margherita Price (HUF)`,
+plot(cola_price$cola_price, cola_price$margherita_price,
      pch = 19,         # Solid circle
      cex = 1.5,        # Make 150% size
      col = "#cc0000",  # Red
@@ -217,7 +218,7 @@ par(mfrow=c(1, 1))
 hist(lynx)
 
 # Add some options
-hist(cola_price$`Margherita Price (HUF)`,
+hist(cola_price$margherita_price,
      breaks = 48,          # "Suggests" 14 bins
      freq   = FALSE,       # Axis shows density, not freq.
      col    = "thistle1",  # Color for histogram
@@ -225,17 +226,17 @@ hist(cola_price$`Margherita Price (HUF)`,
      xlab   = "Price of pizza")
 
 # Add a normal distribution
-curve(dnorm(x, mean = mean(cola_price$`Margherita Price (HUF)`), sd = sd(cola_price$`Margherita Price (HUF)`)),
+curve(dnorm(x, mean = mean(cola_price$margherita_price), sd = sd(cola_price$margherita_price)),
       col = "thistle4",  # Color of curve
       lwd = 2,           # Line width of 2 pixels
       add = TRUE)        # Superimpose on previous graph
 
 # Add two kernel density estimators
-lines(density(cola_price$`Margherita Price (HUF)`), col = "blue", lwd = 2)
-lines(density(cola_price$`Margherita Price (HUF)`, adjust = 3), col = "purple", lwd = 2)
+lines(density(cola_price$margherita_price, col = "blue", lwd = 2))
+lines(density(cola_price$margherita_price, adjust = 3, col = "purple", lwd = 2))
 
 # Add a rug plot
-rug(cola_price$`Margherita Price (HUF)`, lwd = 2, col = "gray")
+rug(cola_price$margherita_price, lwd = 2, col = "gray")
 
 
 
@@ -246,7 +247,7 @@ pacman::p_load(pacman, psych)
 # SELECT BY CATEGORY #######################################
 
 # Price of pizza in the capital
-hist(cola_price$`Margherita Price (HUF)`[cola_price$Region == "Capital"],
+hist(cola_price$margherita_price [cola_price$Region == "Capital"],
      main = "Pizza Prices in the capital")
 
 # Price of pizza in the countryside
@@ -254,7 +255,17 @@ hist(cola_price[cola_price$Region == "Countryside"],
      main = "Price of pizza in the countryside")
 
 
+#Multiple test to determine whether the marghertia pizza prices in the Capital are the same as in the Countryside
+testing <- cola_price %>% 
+   select(Region, margherita_price) %>% 
+   group_by(Region) %>% 
+   summarise(mean_margherita_price = mean(margherita_price),
+             se_margherita_price =1/sqrt(n())*sd(margherita_price),
+             num_obs=n())
+testing <- mutate(testing, t_stat=mean_margherita_price / se_margherita_price)
 
+#Check results of the multiple test
+testing
 
 # CLEAN UP #################################################
 
