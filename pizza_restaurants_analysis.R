@@ -12,7 +12,7 @@ rm(list=ls())
 if (!require("pacman")) install.packages("pacman")
 
 # USE pacman TO LOAD ADD-ON PACKAGES AS DESIRED
-pacman::p_load(pacman, dplyr, GGally, ggplot2, ggthemes, 
+pacman::p_load(pacman, dplyr, GGally, ggplot, ggplot2, ggthemes, 
                ggvis, httr, lubridate, plotly, rio, rmarkdown, shiny, 
                stringr, tidyr, moments) 
 # CALL PACKAGES
@@ -57,18 +57,21 @@ typeof(rest_data$distance)
 rest_data$online_rating <- as.double(gsub(",", ".", gsub("\\.", "", rest_data$online_rating))) 
 rest_data$distance <- as.double(gsub(",", ".", gsub("\\.", "", rest_data$distance)))
            
+
 ## FILTER MISSING VALUES FROM THE "cola_price" COLUMN
-cola_price <- filter(rest_data,!is.na(cola_price))
+## ASSIGN THE FILTERED THE DATASET TO A NEW VARIABLE CALLED 'f_rest_data'
+f_rest_data <- filter(rest_data,!is.na(cola_price))
+
 
 # DATA VIEWER
-View(cola_price)
+View(f_rest_data)
 
 
 # COMPUTER BASIC STATISTICS FOR 'margherita_price'
-summary(cola_price$margherita_price)
+summary(f_rest_data$margherita_price)
 
 # COMPUTE SUMMARY STATISTICS FOR 'margherita_price'
-rest_summary <- cola_price %>%  summarise( 
+rest_summary <- f_rest_data %>%  summarise( 
       mean = mean( margherita_price ),
       median = median( margherita_price ),
       sd = sd( margherita_price  ),
@@ -80,11 +83,11 @@ rest_summary <- cola_price %>%  summarise(
 
 
 # COMPUTE BASIC STATISTICS FOR 'cola price'
-summary(cola_price$cola_price )
+summary(f_rest_data$cola_price )
 
 # COMPUTE SUMMARY STATISTICS FOR 'cola_price'
 cola-price-histogram
-cola_summarystats <- cola_price %>% summarise( 
+cola_stat <- f_rest_data %>% summarise( 
       mean = mean( cola_price ),
       median = median( cola_price ),
       sd = sd( cola_price  ),
@@ -97,13 +100,12 @@ cola_summarystats <- cola_price %>% summarise(
  master
 
 # JOIN SUMMARY STATISTICS TABLES FOR 'margherita_price' & 'cola_price' (NEED TO ADD ROW NAMES: pizza & cola)
-stat_table <- rest_summary %>% add_row( cola_summarystats )
+stat_table <- rest_summary %>% add_row( cola_stat )
 stat_table
  
  
- 
 # format the table and print
-xt_cola <- xtable(cola_summarystats,caption = "Summary Table: Cola Prices",align='llccccccc', digits = c(2,0,2,0,0,0,0,3,0))
+xt_cola <- xtable(cola_stat,caption = "Summary Table: Cola Prices",align='llccccccc', digits = c(2,0,2,0,0,0,0,3,0))
 names(xt_cola) <- c('Mean','Median','Std.dev.','Min','Max','IQ range','Skewness', 'Observations' )
 print(xt_cola, type = "latex", comment = getOption("xtable.comment", FALSE))
 
@@ -113,16 +115,105 @@ names(xt_pizza) <- c('Mean','Median','Std.dev.','Min','Max','IQ range','Skewness
 print(xt_pizza, type = "latex", comment = getOption("xtable.comment", FALSE))
 
 
-# PLOTS #######################################
+# BASIC HISTOGRAMS #########################################
 
-# Separate plots for pizza prices based on region 
-ggplot(cola_price, aes(x = Region , y = margherita_price)) +
-   geom_point(position = position_jitter(0.2)) +
-   xlab("Region") + 
-   ylab("Margherita Pizza Price (HUF)")
+# Put graphs in 2 rows and 1 column
+par(mfrow = c(2, 1))
+
+cola-price-histogram
+## Histogram for cola prices
+f_rest_data %>% 
+   ggplot(aes(x=cola_price)) +
+   geom_histogram()+ 
+   theme_gray()+
+   labs(x='Price', y='Frequency', title = 'Cola Price Distribution')
+
+ master
+
+pizza_price-histogram
+##Histogram for pizza prices
+ f_rest_data %>% 
+    ggplot(aes(x = margherita_price)) +
+    geom_histogram()+ 
+    theme_gray()+
+    labs(x='Price', y='Frequency', title = 'Margherita Pizza Price Distribution')
+ 
+ master
+
+ # RESTORE GRAPHIC PARAMETER
+ par(mfrow=c(1, 1))
+ 
+ 
+ # HISTOGRAM BY GROUP #############################
+ 
+ # Put graphs in 3 rows and 1 column
+ par(mfrow = c(3, 1))
+ 
+ # Histogram
+ # Margherita price based on region
+ ggplot(data = f_rest_data , aes( x = margherita_price , fill = Region ) ) +
+    geom_histogram( aes( y = ..density.. ), alpha =0.5 ) +
+    labs( x = "Price" , y = 'Relative Frequency'  ,
+          fill = 'Region' )
+ 
+ # BOX PLOT #####################################
+ # Margherita price based on region
+ ggplot(f_rest_data, aes(x = Region , y = margherita_price)) + 
+    geom_boxplot(varwidth = T)
+ 
+ # DENSITY PLOT #################################
+ # Margherita price based on region
+ ggplot(f_rest_data, aes(x = margherita_price , fill = Region)) + 
+    geom_density(col = NA , alpha = 0.35) + 
+    labs( x = "Margherita Price (HUF)" , y = "Density")
+ 
+ # Density plot for pizza and cola prices based on region
+ ggplot( data = f_rest_data ) +
+    geom_density( aes( x = margherita_price ) , color = 'blue'  , alpha = 0.1 ) +
+    geom_density( aes( x = f_rest_data$cola_price )  , color = 'red' , alpha = 0.1 ) +
+    labs(x = "Price in HUF",
+         y = "Relative Frequency" )
+ 
+ 
+ # RESTORE GRAPHIC PARAMETER
+ par(mfrow=c(1, 1))
+ 
+ 
+ # Price of pizza in the capital
+ hist(cola_price$margherita_price[cola_price$Region == "Capital"],
+      main = "Pizza Prices in the capital")
+ 
+ # Price of pizza in the countryside
+ hist(cola_price$margherita_price[cola_price$Region == "Countryside"],
+      main = "Price of pizza in the countryside")
+ 
+ 
+ 
+# HISTOGRAM BY GROUP (REGION = Capital) ################
+
+# Put graphs in 2 rows and 1 column
+par(mfrow = c(2, 1))
+
+# Histogram for price of pizza in the capital
+hist(f_rest_data$margherita_price [f_rest_data$Region == "Capital"],
+     xlim = c(0, 2500),
+     main = "Distribution of Pizza Prices in the Capital",
+     xlab = "Price in HUF",
+     col = "#83BFFF") |+
+   
+
+# Histogram for price of cola in the capital
+hist(f_rest_data$cola_price [f_rest_data$Region == "Capital"],
+     xlim = c(0, 1500),
+     main = "Distribution of PBeverage Prices in the Capital",
+     xlab = "Price in HUF",
+     col = "#FF402F")
 
 
-# Plot Pizza Price vs. Cola Price
+
+# PLOTS ##############################################
+
+# Basic X-Y plot for pizza and cola price variables
 plot(cola_price$margherita_price , cola_price$cola_price, 
      col = "#cc0000",  # Hex code for red
      pch = 19,         # Solid points
@@ -130,133 +221,23 @@ plot(cola_price$margherita_price , cola_price$cola_price,
      xlab = "Pizza Price (HUF)",
      ylab = "Cola Price (HUF)")
 
+# PLot for pizza prices based on region 
+ggplot(cola_price, aes(x = Region , y = margherita_price)) +
+   geom_point(position = position_jitter(0.2)) +
+   xlab("Region") + 
+   ylab("Margherita Pizza Price (HUF)")
 
 
+ggplot(f_rest_data, aes(x = Region , y = margherita_price)) +
+   geom_point(position = position_jitter(0.2)) +
+   xlab("Region") + 
+   ylab("Margherita Pizza Price (HUF)")
 
 
-# Need a table with frequencies for each category
-pizza_price <- table(cola_price$margherita_price)  # Create table
-barplot(pizza_price)              # Bar chart
+# CLEAN UP ###########################################
 
-
-
-
-# BASIC HISTOGRAMS #########################################
-
-cola-price-histogram
-##Histogram for cola prices
-cola_price %>% 
-   ggplot(aes(x=cola_price)) +
-   geom_histogram()+ 
-   theme_gray()+
-   labs(x='Price', y='Count', title = 'Cola Price Distribution')
-
- master
-
- 
-pizza_price-histogram
-##Histogram for pizza prices
- cola_price %>% 
-    ggplot(aes(x = margherita_price)) +
-    geom_histogram()+ 
-    theme_gray()+
-    labs(x='Price', y='Count', title = 'Margherita Pizza Price Distribution')
- 
- master
- 
- 
-
-# HISTOGRAM BY GROUP #######################################
-
-# Put graphs in 2 rows and 1 column
-par(mfrow = c(2, 1))
-
-# Histogram for price of pizza in the capital
-hist(cola_price$`Margherita Price (HUF)` [cola_price$Region == "Capital"],
-     xlim = c(0, 2500),
-     breaks = 27,
-     main = "Distribution of the pizza price in the capital",
-     xlab = "",
-     col = "red")
-
-hist(cola_price$`0.5L Cola Price (HUF)` (HUF)` [cola_price$Region == "Capital"],
-     xlim = c(0, 1500),
-     ##breaks = 27,
-     main = "Distribution of the pizza price in the capital",
-     xlab = "",
-     col = "blue")
-
-
-
-# PLOTS ####################################################
-
-# Good to first check univariate distributions
-hist(cola_price$`Margherita Price (HUF)`)
-hist(cola_price$`0.5L Cola Price (HUF)`)
-
-# Basic X-Y plot for two quantitative variables
-plot(cola_price$`0.5L Cola Price (HUF)`, cola_price$`Margherita Price (HUF)`)
-
-# Add some options
-plot(cola_price$`0.5L Cola Price (HUF)`, cola_price$`Margherita Price (HUF)`,
-     pch = 19,         # Solid circle
-     cex = 1.5,        # Make 150% size
-     col = "#cc0000",  # Red
-     main = "Scatterplot for price: Pizza vs. Beverage",
-     xlab = "Beverage Price",
-     ylab = "Pizza Price")
-
-
-# Restore graphic parameter
+# RESTORE GRAPHIC PARAMETER
 par(mfrow=c(1, 1))
-
-
-# HISTOGRAM ################################################
-
-# Default
-hist(lynx)
-
-# Add some options
-hist(cola_price$`Margherita Price (HUF)`,
-     breaks = 48,          # "Suggests" 14 bins
-     freq   = FALSE,       # Axis shows density, not freq.
-     col    = "thistle1",  # Color for histogram
-     main   = paste("Histogram of Prices of pizza"),
-     xlab   = "Price of pizza")
-
-# Add a normal distribution
-curve(dnorm(x, mean = mean(cola_price$`Margherita Price (HUF)`), sd = sd(cola_price$`Margherita Price (HUF)`)),
-      col = "thistle4",  # Color of curve
-      lwd = 2,           # Line width of 2 pixels
-      add = TRUE)        # Superimpose on previous graph
-
-# Add two kernel density estimators
-lines(density(cola_price$`Margherita Price (HUF)`), col = "blue", lwd = 2)
-lines(density(cola_price$`Margherita Price (HUF)`, adjust = 3), col = "purple", lwd = 2)
-
-# Add a rug plot
-rug(cola_price$`Margherita Price (HUF)`, lwd = 2, col = "gray")
-
-
-
-# Use pacman to load add-on packages as desired
-pacman::p_load(pacman, psych) 
-
-
-# SELECT BY CATEGORY #######################################
-
-# Price of pizza in the capital
-hist(cola_price$`Margherita Price (HUF)`[cola_price$Region == "Capital"],
-     main = "Pizza Prices in the capital")
-
-# Price of pizza in the countryside
-hist(cola_price[cola_price$Region == "Countryside"],
-     main = "Price of pizza in the countryside")
-
-
-
-
-# CLEAN UP #################################################
 
 # Clear environment
 rm(list = ls()) 
@@ -273,4 +254,3 @@ dev.off()
 
 # Clear console
 cat("\014")
-
