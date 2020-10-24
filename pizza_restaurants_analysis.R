@@ -23,9 +23,15 @@ library(tidyverse)
 rest_data <- import("~/raw/pizza_restaurants_raw.csv")
 head(rest_data)
 
+<<<<<<< HEAD
 #Import the .csv file
 data_in <- "/Users/steve_j/Downloads"
 rest_data <- read.csv(paste0(data_in,"/pizza_restaurants_raw.csv"))
+=======
+# IMPORTING THE CSV FILE (ALTERNATIVELY)
+data_in <- "C:/Users/ADMIN/Desktop/CEU/R_codes/DA1_Task_2/raw/"
+rest_data <- read.csv(paste0(data_in,"pizza_restaurants_raw.csv"))
+>>>>>>> dc9586f7657788524bd818731d1003654623fc1e
 
 
 #We take a look how our table looks like
@@ -39,11 +45,19 @@ rest_data$distance <- as.double(gsub(",", ".", gsub("\\.", "", rest_data$distanc
 
 # Column names are not align with naming conventions
 rest_data <- rename(rest_data,
+<<<<<<< HEAD
                     margherita_price = Margherita.Price..HUF.,
                     pizza_only = Pizza.only..binary.,
                     cola_price = X0.5L.Cola.Price..HUF.,
                     online_rating = Online.rating,
                     distance = Distance.to.CEU..KM.)
+=======
+                    margherita_price = `Margherita.Price..HUF.`,
+                    pizza_only = `Pizza.only..binary.`,
+                    cola_price = `X0.5L.Cola.Price..HUF.`,
+                    online_rating = `Online.rating`,
+                    distance = `Distance.to.CEU..KM.`)
+>>>>>>> dc9586f7657788524bd818731d1003654623fc1e
 
 
 # It seems some columns do not contain numeric values, we should check that:
@@ -118,6 +132,7 @@ hist(pizza_dataset$`0.5L Cola Price (HUF)`) ## missing value error
 par(mfrow = c(2, 1))
 
 # Histogram for price of pizza in the capital
+<<<<<<< HEAD
 hist(pizza_dataset$`Margherita Price (HUF)` [pizza_dataset$Region == "Capital"],
      xlim = c(0, 2500),
      breaks = 27,
@@ -153,6 +168,106 @@ plot(pizza_dataset$`0.5L Cola Price (HUF)`, pizza_dataset$`Margherita Price (HUF
 
 
 # Restore graphic parameter
+=======
+ hist(f_rest_data$margherita_price [f_rest_data$Region == "Capital"],
+      xlim = c(0, 2500),
+      main = "Distribution of Pizza Prices in the Capital",
+      xlab = "Price of Pizza in HUF",
+      col = "#83BFFF")
+   
+   
+# Histogram for price of cola in the capital
+  hist(f_rest_data$cola_price [f_rest_data$Region == "Capital"],
+        xlim = c(0, 1500),
+        main = "Distribution of Beverage Prices in the Capital",
+        xlab = "Price of Cola in HUF",
+        col = "#FF8784")
+ 
+
+# HISTOGRAM BY GROUP (REGION = Countryside) ################
+  
+# Put graphs in 2 rows and 1 column
+  par(mfrow = c(2, 1))
+  
+# Histogram for price of pizza in the countryside
+  hist(f_rest_data$margherita_price [f_rest_data$Region == "Countryside"],
+       xlim = c(0, 2500),
+       main = "Distribution of Pizza Prices in the Countryside",
+       xlab = "Price of Pizza in HUF",
+       col = "#83BFFF")
+  
+  
+# Histogram for price of cola in the countrysude
+  hist(f_rest_data$cola_price [f_rest_data$Region == "Countryside"],
+       xlim = c(0, 1500),
+       main = "Distribution of Beverage Prices in the Countryside",
+       xlab = "Price of Cola in HUF",
+       col = "#FF8784")
+    
+ 
+# RESTORE GRAPHIC PARAMETER
+ par(mfrow=c(1, 1))
+ 
+ 
+# HISTOGRAMS GROUPED BY REGION #################
+ 
+# Put graphs in 3 rows and 1 column
+ par(mfrow = c(3, 1))
+ 
+# Histogram
+# Margherita price based on region
+ ggplot(data = f_rest_data , aes( x = margherita_price , fill = Region ) ) +
+    geom_histogram( aes( y = ..density.. ), alpha =0.5 ) +
+    labs( x = "Price" , y = 'Relative Frequency'  ,
+          fill = 'Region' )
+
+ # Cola price based on region
+ ggplot(data = f_rest_data , aes( x = cola_price , fill = Region ) ) +
+   geom_histogram( aes( y = ..density.. ), alpha =0.5 ) +
+   labs( x = "Price" , y = 'Relative Frequency'  ,
+         fill = 'Region' ) 
+ 
+  
+# BOX PLOT #####################################
+# Margherita price based on region
+ ggplot(f_rest_data, aes(x = Region , y = margherita_price)) + 
+    geom_boxplot(varwidth = T)
+ 
+ # Cola price based on region
+ ggplot(f_rest_data, aes(x = Region , y = cola_price)) + 
+   geom_boxplot(varwidth = T)
+  
+ 
+ # DENSITY PLOT ###############################
+ # Margherita price based on region
+ ggplot(f_rest_data, aes(x = margherita_price , fill = Region)) + 
+    geom_density(col = NA , alpha = 0.35) + 
+    labs( x = "Margherita Price (HUF)" , y = "Density")
+ 
+ # Density plot for pizza and cola prices based on region
+ ggplot( data = f_rest_data ) +
+    geom_density( aes( x = margherita_price ) , color = 'blue'  , alpha = 0.1 ) +
+    geom_density( aes( x = f_rest_data$cola_price )  , color = 'red' , alpha = 0.1 ) +
+    labs(x = "Price in HUF",
+         y = "Relative Frequency" )
+ 
+ 
+#Multiple test to determine whether the marghertia pizza prices in the Capital are the same as in the Countryside
+testing <- f_rest_data %>% 
+   select(Region, margherita_price) %>% 
+   group_by(Region) %>% 
+   summarise(mean_margherita_price = mean(margherita_price),
+             se_margherita_price =1/sqrt(n())*sd(margherita_price),
+             num_obs=n())
+ testing <- mutate(testing, t_stat=mean_margherita_price / se_margherita_price)
+ 
+ #Check results of the multiple test
+ testing
+
+# CLEAN UP ###########################################
+
+# RESTORE GRAPHIC PARAMETER
+>>>>>>> dc9586f7657788524bd818731d1003654623fc1e
 par(mfrow=c(1, 1))
 
 
