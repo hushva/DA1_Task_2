@@ -24,12 +24,18 @@ rest_data <- import("~/raw/pizza_restaurants_raw.csv")
 head(rest_data)
 
 #Import the .csv file
-data_in <- "~/Documents/CEU/Courses/2020_Fall/Mandatory/DA1/Task2/DA1_Task_2/"
-rest_data <- read.csv(paste0(data_in,"raw/pizza_restaurants_raw.csv"))
+data_in <- "/Users/steve_j/Downloads"
+rest_data <- read.csv(paste0(data_in,"/pizza_restaurants_raw.csv"))
 
 
 #We take a look how our table looks like
 View(rest_data)
+
+# CHANGE VARIABLE DATA TYPE
+# REPLACE THE COMMA SEPERATOR WITH POINT
+rest_data$Online.rating<- as.double(gsub(",", ".", gsub("\\.", "", rest_data$online_rating))) 
+rest_data$distance <- as.double(gsub(",", ".", gsub("\\.", "", rest_data$distance)))
+
 
 # Column names are not align with naming conventions
 rest_data <- rename(rest_data,
@@ -52,7 +58,7 @@ typeof(rest_data$Distance.to.CEU..KM.)
 
 View(rest_data)
 
-colnames(rest_data)[9] <- "Distance"
+colnames(rest_data)[9] <- "pizza_only"
 #As it turned out, Online rating and Distance to CEU are character types, need to replace , with .
 
 rest_data$Online.rating <- as.integer(rest_data$Online.rating)
