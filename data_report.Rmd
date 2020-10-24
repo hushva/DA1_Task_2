@@ -33,15 +33,55 @@ print(xt_cola, type = "latex", comment = getOption("xtable.comment", FALSE))
 
 ```
 
-
-# Figure 1.1 
-
-```{r, echo=FALSE, warning=F, message=F, warning=FALSE}
-
-```
-
-# Figure 1.2
+# Figure 1.1 Pizza and Cola Price Distributions 
 
 ```{r, echo=FALSE, warning=F, message=F, warning=FALSE}
+# BASIC HISTOGRAMS #########################################
 
+# Put graphs in 2 rows and 1 column
+par(mfrow = c(2, 1))
+
+cola-price-histogram
+## Histogram for cola prices
+f_rest_data %>% 
+  ggplot(aes(x=cola_price)) +
+  geom_histogram()+ 
+  theme_gray()+
+  labs(x='Price', y='Frequency', title = 'Cola Price Distribution')
+
+master
+
+pizza_price-histogram
+##Histogram for pizza prices
+f_rest_data %>% 
+  ggplot(aes(x = margherita_price)) +
+  geom_histogram()+ 
+  theme_gray()+
+  labs(x='Price', y='Frequency', title = 'Margherita Pizza Price Distribution')
+
+master
 ```
+
+# Figure 2.1 Pizza Price Dsitribution Conditioned on Region 
+
+```{r, echo=FALSE, warning=F, message=F, warning=FALSE}
+ ggplot(f_rest_data, aes(x = Region , y = margherita_price)) + 
+    geom_boxplot(varwidth = T)
+```
+
+# Table 2.1 
+
+```{r, echo=FALSE, warning=F, message=F, warning=FALSE}
+testing <- f_rest_data %>% 
+   select(Region, margherita_price) %>% 
+   group_by(Region) %>% 
+   summarise(mean_margherita_price = mean(margherita_price),
+             se_margherita_price =1/sqrt(n())*sd(margherita_price),
+             num_obs=n())
+ testing <- mutate(testing, t_stat=mean_margherita_price / se_margherita_price)
+ 
+ testing 
+```
+
+## Summary 
+
