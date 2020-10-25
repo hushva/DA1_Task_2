@@ -18,12 +18,12 @@ pacman::p_load(pacman, dplyr, GGally, ggplot, ggplot2, ggthemes,
 # CALL PACKAGES
 library(tidyverse)
 library(xtable)
-library(ggplot)
+library(ggplot2)
 
 
 # IMPORTING THE CSV FILE (ALTERNATIVELY)
-data_in <- "C:/Users/ADMIN/Desktop/CEU/R_codes/DA1_Task_2/raw/"
-rest_data <- read.csv(paste0(data_in,"pizza_restaurants_raw.csv"))
+data_in <- "~/Documents/CEU/Courses/2020_Fall/Mandatory/DA1/Task2/DA1_Task_2/"
+rest_data <- read.csv(paste0(data_in,"/raw/pizza_restaurants_raw.csv"))
 
 
 # DATA VIEWER ############################################
@@ -62,6 +62,9 @@ f_rest_data <- filter(rest_data,!is.na(cola_price))
 # DATA VIEWER
 View(f_rest_data)
 
+#WRITE OUT CLEANED DATA TABLE
+write_csv( f_rest_data , paste0( data_in,
+                                  "clean/pizza_restaurants_clean.csv"))
 
 # COMPUTER BASIC STATISTICS FOR 'margherita_price'
 summary(f_rest_data$margherita_price)
