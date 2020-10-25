@@ -5,170 +5,161 @@
 
 # INSTALL AND LOAD PACKAGES ################################
 
-
-# Installs pacman ("package manager") if needed
-if (!require("pacman")) install.packages("pacman")
-
-# Use pacman to load add-on packages as desired
-pacman::p_load(pacman, dplyr, GGally, ggplot2, ggthemes, 
-               ggvis, httr, lubridate, plotly, rio, rmarkdown, shiny, 
-               stringr, tidyr) 
-# Clear the environment
+# CLEAR THE ENVIRONMENT
 rm(list=ls())
 
+# INSTALL pacman if needed
+if (!require("pacman")) install.packages("pacman")
+
+# USE pacman TO LOAD ADD-ON PACKAGES AS DESIRED
+pacman::p_load(pacman, dplyr, GGally, ggplot, ggplot2, ggthemes, 
+               ggvis, httr, lubridate, plotly, rio, rmarkdown, shiny, 
+               stringr, tidyr, moments) 
+# CALL PACKAGES
 library(tidyverse)
+library(xtable)
+library(ggplot)
 
-# IMPORTING THE DATASET WITH RIO ##########################
-# CSV
-rest_data <- import("~/raw/pizza_restaurants_raw.csv")
-head(rest_data)
 
-<<<<<<< HEAD
-#Import the .csv file
-data_in <- "/Users/steve_j/Downloads"
-rest_data <- read.csv(paste0(data_in,"/pizza_restaurants_raw.csv"))
-=======
 # IMPORTING THE CSV FILE (ALTERNATIVELY)
 data_in <- "C:/Users/ADMIN/Desktop/CEU/R_codes/DA1_Task_2/raw/"
 rest_data <- read.csv(paste0(data_in,"pizza_restaurants_raw.csv"))
->>>>>>> dc9586f7657788524bd818731d1003654623fc1e
 
 
-#We take a look how our table looks like
+# DATA VIEWER ############################################
 View(rest_data)
 
-# CHANGE VARIABLE DATA TYPE
-# REPLACE THE COMMA SEPERATOR WITH POINT
-rest_data$Online.rating<- as.double(gsub(",", ".", gsub("\\.", "", rest_data$online_rating))) 
-rest_data$distance <- as.double(gsub(",", ".", gsub("\\.", "", rest_data$distance)))
 
-
-# Column names are not align with naming conventions
+# CHANGE NAMING CONVENTION OF COLUMNS
 rest_data <- rename(rest_data,
-<<<<<<< HEAD
-                    margherita_price = Margherita.Price..HUF.,
-                    pizza_only = Pizza.only..binary.,
-                    cola_price = X0.5L.Cola.Price..HUF.,
-                    online_rating = Online.rating,
-                    distance = Distance.to.CEU..KM.)
-=======
                     margherita_price = `Margherita.Price..HUF.`,
                     pizza_only = `Pizza.only..binary.`,
                     cola_price = `X0.5L.Cola.Price..HUF.`,
                     online_rating = `Online.rating`,
                     distance = `Distance.to.CEU..KM.`)
->>>>>>> dc9586f7657788524bd818731d1003654623fc1e
 
 
+# CHECK VARIABLE DATA TYPES #############################
 # It seems some columns do not contain numeric values, we should check that:
-typeof(rest_data$Margherita.Price..HUF.)
-typeof(rest_data$X0.5L.Cola.Price..HUF.)
-typeof(rest_data$Online.rating)
-typeof(rest_data$Pizza.only..binary.)
-typeof(rest_data$Distance.to.CEU..KM.)
+typeof(rest_data$margherita_price)
+typeof(rest_data$cola_price)
+typeof(rest_data$online_rating)
+typeof(rest_data$pizza_only)
+typeof(rest_data$distance)
 
 
+# CHANGE VARIABLE DATA TYPE
+# REPLACE THE COMMA SEPERATOR WITH POINT
+rest_data$online_rating <- as.double(gsub(",", ".", gsub("\\.", "", rest_data$online_rating))) 
+rest_data$distance <- as.double(gsub(",", ".", gsub("\\.", "", rest_data$distance)))
+           
+
+## FILTER MISSING VALUES FROM THE "cola_price" COLUMN
+## ASSIGN THE FILTERED THE DATASET TO A NEW VARIABLE CALLED 'f_rest_data'
+f_rest_data <- filter(rest_data,!is.na(cola_price))
 
 
-View(rest_data)
-
-colnames(rest_data)[9] <- "pizza_only"
-#As it turned out, Online rating and Distance to CEU are character types, need to replace , with .
-
-rest_data$Online.rating <- as.integer(rest_data$Online.rating)
+# DATA VIEWER
+View(f_rest_data)
 
 
+# COMPUTER BASIC STATISTICS FOR 'margherita_price'
+summary(f_rest_data$margherita_price)
+
+# COMPUTE SUMMARY STATISTICS FOR 'margherita_price'
+rest_summary <- f_rest_data %>%  summarise( 
+      mean = mean( margherita_price ),
+      median = median( margherita_price ),
+      sd = sd( margherita_price  ),
+      min = min( margherita_price ),
+      max = max( margherita_price ),
+      iq_range = IQR( margherita_price ),
+      skew = skewness(margherita_price), # skewness function using moments package
+      numObs = sum( !is.na( margherita_price )))
 
 
+# COMPUTE BASIC STATISTICS FOR 'cola price'
+summary(f_rest_data$cola_price )
+
+# COMPUTE SUMMARY STATISTICS FOR 'cola_price'
+cola_stat <- f_rest_data %>% summarise( 
+      mean = mean( cola_price ),
+      median = median( cola_price ),
+      sd = sd( cola_price  ),
+      min = min( cola_price ),
+      max = max( cola_price ),
+      iq_range = IQR( cola_price ),
+      skew = ((mean(cola_price)-median(cola_price))/sd(cola_price)),
+      numObs = sum( !is.na( cola_price )) )
+ 
+ 
+# format the table and print
+xt_cola <- xtable(cola_stat,caption = "Summary Table: Cola Prices",align='llccccccc', digits = c(2,0,2,0,0,0,0,3,0))
+names(xt_cola) <- c('Mean','Median','Std.dev.','Min','Max','IQ range','Skewness', 'Observations' )
+print(xt_cola, type = "latex", comment = getOption("xtable.comment", FALSE))
 
 
-
-summary(pizza_dataset$`Margherita Price (HUF)`)
-# Create descriptive table
-rests_stat <- summarise( pizza_dataset , 
-                              mean = mean( pizza_dataset$`Margherita Price (HUF)` ),
-                              median = median( pizza_dataset$`Margherita Price (HUF)` ),
-                              std = sd( pizza_dataset$`Margherita Price (HUF)` ),
-                              min = min( pizza_dataset$`Margherita Price (HUF)` ),
-                              max = max( pizza_dataset$`Margherita Price (HUF)` ) )
+xt_pizza <- xtable(rest_summary,caption = "Summary Table: Margherita Prices",align='llccccccc', digits = c(2,0,2,0,0,0,0,3,0))
+names(xt_pizza) <- c('Mean','Median','Std.dev.','Min','Max','IQ range','Skewness', 'Observations' )
+print(xt_pizza, type = "latex", comment = getOption("xtable.comment", FALSE))
 
 
-vienna_sum_stat
-
-summary(pizza_dataset$`0.5L Cola Price (HUF)`)
-# Clone the dataset and assign it to a variable
-
-
-
-
-# Plot Pizza Price vs. Beverage Price
-
-plot(pizza_dataset$`Margherita Price (HUF)`, pizza_dataset$`0.5L Cola Price (HUF)`,
-     col = "#cc0000",  # Hex code for red
-     pch = 19,         # Solid points
-     main = "Pizza Restaurants: Prices of Pizza Vs. Price of Beverage",
-     xlab = "Pizza Price (HUF)",
-     ylab = "Beverage Price (HUF)")
-
-
-
-# Need a table with frequencies for each category
-pizza_price <- table(pizza_dataset$`Margherita Price (HUF)`)  # Create table
-barplot(pizza_price)              # Bar chart
-plot(pizza_price)                 # Default X-Y plot (lines)
-
-
+# JOIN SUMMARY STATISTICS TABLES FOR 'margherita_price' & 'cola_price'
+stat_table <- xt_pizza %>% add_row( xt_cola )
+stat_table
 
 
 
 # BASIC HISTOGRAMS #########################################
 
-hist(pizza_dataset$`Margherita Price (HUF)`)
-hist(pizza_dataset$`0.5L Cola Price (HUF)`) ## missing value error
-
-# HISTOGRAM BY GROUP #######################################
-
 # Put graphs in 2 rows and 1 column
 par(mfrow = c(2, 1))
 
+## Histogram for cola prices
+f_rest_data %>% 
+  ggplot(aes(x=cola_price)) +
+  geom_histogram()+ 
+  theme_gray()+
+  labs(x='Price', y='Frequency', title = 'Cola Price Distribution')
+
+##Histogram for pizza prices
+f_rest_data %>% 
+  ggplot(aes(x = margherita_price)) +
+  geom_histogram()+ 
+  theme_gray()+
+  labs(x='Price', y='Frequency', title = 'Margherita Pizza Price Distribution')
+
+
+# PLOTS ##############################################
+
+# Basic X-Y plot for pizza and cola price variables
+plot(f_rest_data$margherita_price , f_rest_data$cola_price, 
+     col = "#cc0000",  # Hex code for red
+     pch = 19,         # Solid points
+     main = "Pizza Restaurants: Prices of Pizza Vs. Price of Cola",
+     xlab = "Pizza Price (HUF)",
+     ylab = "Cola Price (HUF)")
+
+
+# PLot for pizza prices based on region 
+ggplot(f_rest_data, aes(x = Region , y = margherita_price)) +
+   geom_point(position = position_jitter(0.15)) +
+   xlab("Region") + 
+   ylab("Margherita Pizza Price (HUF)")
+
+# PLot for cola prices based on region
+ggplot(f_rest_data, aes(x = Region , y = cola_price)) +
+   geom_point(position = position_jitter(0.15)) +
+   xlab("Region") + 
+   ylab("Cola Price (HUF)")
+
+ 
+# HISTOGRAM BY GROUP (REGION = Capital) ################
+ 
+# Put graphs in 2 rows and 1 column
+ par(mfrow = c(2, 1))
+ 
 # Histogram for price of pizza in the capital
-<<<<<<< HEAD
-hist(pizza_dataset$`Margherita Price (HUF)` [pizza_dataset$Region == "Capital"],
-     xlim = c(0, 2500),
-     breaks = 27,
-     main = "Distribution of the pizza price in the capital",
-     xlab = "",
-     col = "red")
-
-hist(pizza_dataset$`0.5L Cola Price (HUF)` (HUF)` [pizza_dataset$Region == "Capital"],
-     xlim = c(0, 1500),
-     ##breaks = 27,
-     main = "Distribution of the pizza price in the capital",
-     xlab = "",
-     col = "blue")
-
-
-# PLOTS ####################################################
-
-# Good to first check univariate distributions
-hist(pizza_dataset$`Margherita Price (HUF)`)
-hist(pizza_dataset$`0.5L Cola Price (HUF)`)
-
-# Basic X-Y plot for two quantitative variables
-plot(pizza_dataset$`0.5L Cola Price (HUF)`, pizza_dataset$`Margherita Price (HUF)`)
-
-# Add some options
-plot(pizza_dataset$`0.5L Cola Price (HUF)`, pizza_dataset$`Margherita Price (HUF)`,
-     pch = 19,         # Solid circle
-     cex = 1.5,        # Make 150% size
-     col = "#cc0000",  # Red
-     main = "Scatterplot for price: Pizza vs. Beverage",
-     xlab = "Beverage Price",
-     ylab = "Pizza Price")
-
-
-# Restore graphic parameter
-=======
  hist(f_rest_data$margherita_price [f_rest_data$Region == "Capital"],
       xlim = c(0, 2500),
       main = "Distribution of Pizza Prices in the Capital",
@@ -267,88 +258,21 @@ testing <- f_rest_data %>%
 # CLEAN UP ###########################################
 
 # RESTORE GRAPHIC PARAMETER
->>>>>>> dc9586f7657788524bd818731d1003654623fc1e
 par(mfrow=c(1, 1))
-
-
-# HISTOGRAM ################################################
-
-# Default
-hist(lynx)
-
-# Add some options
-hist(pizza_dataset$`Margherita Price (HUF)`,
-     breaks = 48,          # "Suggests" 14 bins
-     freq   = FALSE,       # Axis shows density, not freq.
-     col    = "thistle1",  # Color for histogram
-     main   = paste("Histogram of Prices of pizza"),
-     xlab   = "Price of pizza")
-
-# Add a normal distribution
-curve(dnorm(x, mean = mean(pizza_dataset$`Margherita Price (HUF)`), sd = sd(pizza_dataset$`Margherita Price (HUF)`)),
-      col = "thistle4",  # Color of curve
-      lwd = 2,           # Line width of 2 pixels
-      add = TRUE)        # Superimpose on previous graph
-
-# Add two kernel density estimators
-lines(density(pizza_dataset$`Margherita Price (HUF)`), col = "blue", lwd = 2)
-lines(density(pizza_dataset$`Margherita Price (HUF)`, adjust = 3), col = "purple", lwd = 2)
-
-# Add a rug plot
-rug(pizza_dataset$`Margherita Price (HUF)`, lwd = 2, col = "gray")
-
-
-# SUMMARY() ################################################
-
-summary(pizza_dataset$`Online rating`)       # Categorical variable
-summary(pizza_dataset$`Margherita Price (HUF)`)  # Quantitative variable
-summary(pizza_dataset)               # Entire data frame
-
-# Use pacman to load add-on packages as desired
-pacman::p_load(pacman, psych) 
-
-# Get info on package
-p_help(psych)           # Opens package PDF in browser
-p_help(psych, web = F)  # Opens help in R Viewer
-
-# DESCRIBE() ###############################################
-
-# For quantitative variables only.
-
-describe(pizza_dataset$`Margherita Price (HUF)`)  # One quantitative variable
-describe(pizza_dataset)               # Entire data frame
-
-
-# SELECT BY CATEGORY #######################################
-
-# Price of pizza in the capital
-hist(pizza_dataset$`Margherita Price (HUF)`[pizza_dataset$Region == "Capital"],
-     main = "Pizza Prices in the capital")
-
-# Price of pizza in the countryside
-hist(pizza_dataset[pizza_dataset$Region == "Countryside"],
-     main = "Price of pizza in the countryside")
-
-
-
-
-
-
-# CLEAN UP #################################################
 
 # Clear environment
 rm(list = ls()) 
 
-# Clear packages
-p_unload(all)  # Remove all add-ons
+# Clear packages and ad-ons
+p_unload(all) 
 
 
 # Clear packages
 detach("package:datasets", unload = TRUE) #For base
 
 # Clear plots
-dev.off()  # But only if there IS a plot
+dev.off()
 
 # Clear console
-cat("\014")  # ctrl+L
+cat("\014")
 
