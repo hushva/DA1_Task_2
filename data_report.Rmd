@@ -7,7 +7,7 @@ theme: cayman
 ---
 # Data Collection Process 
 
-The data collection process took place in a primarily online setting. Main sources included searches through Google and NetPincer websites. The restaurants were selected in random fashion. Restaurants outside of Budapest, were selected from cities with the population ranging from 60 thousand to 200 thousand, in an attempt to increase coverage. The number of observations was limited to three to avoid bias. The cola beverage was chosen as a variable in order to avoid missing values. Due to high popularity, the assumption was that, Cola is available almost anywhere in some shape or form. In addition, no distinction was made between nominal brands of cola (e.g. Pepsi-Cola vs. Coca-Cola). In order to manage the geographic restrictions and the limited opening hours, a binary variable was selected. The variable measures if the observed restaurant serves pizza only or has additional items on the menu (e.g. pasta, soup, non-Italian cuisine, etc.). In case of further research, the variable can be used as a conditioning variable, to explore correlation between it and other variables. The main cahllenges faced during the collection of the data are listed below 
+The data collection process took place in a primarily online setting. Main sources included searches through Google and NetPincer websites. The restaurants were selected in random fashion. Restaurants outside of Budapest, were selected from cities with the population ranging from 60 thousand to 200 thousand, in an attempt to increase coverage. The number of observations was limited to three to avoid bias. The cola beverage was chosen as a variable in order to avoid missing values. Due to high popularity, the assumption was that, Cola is available almost anywhere in some shape or form. In addition, no distinction was made between nominal brands of cola (e.g. Pepsi-Cola vs. Coca-Cola). In order to manage the geographic restrictions and the limited opening hours, a binary variable was selected. The variable measures if the observed restaurant serves pizza only or has additional items on the menu (e.g. pasta, soup, non-Italian cuisine, etc.). In case of further research, the variable can be used as a conditioning variable, to explore correlation between it and other variables. The main challenges faced during the collection of the data are listed below: 
 
 * Some of the restaurants don’t have an online presence, which makes it harder to record observations and thus increases the chance of incomplete coverage. 
 * Most of the places don’t have a uniform menu features, meaning some of the places don’t indicate the pizza size while others don’t have cola on the menu. This resulted in missing values for some observations. 
@@ -137,6 +137,7 @@ We could conclude based on the t-stats that the average price of margherita pizz
 # Summary 
 
 The Capital distribution of prices covers more of the higher values and it is more spread out than the Countryside distribution of prices. The pizza prices in the Capital tend to be higher than in the Countryside.
+
 
 
 
