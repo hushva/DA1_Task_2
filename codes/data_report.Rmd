@@ -1,0 +1,144 @@
+---
+title: "**Assignment**"
+author: "Team C"
+geiometry: "margin=2cm"
+output: pdf_document
+theme: cayman
+---
+# Data Collection Process 
+
+The data collection process took place in a primarily online setting. Main sources included searches through Google and NetPincer websites. The restaurants were selected in random fashion. Restaurants outside of Budapest, were selected from cities with the population ranging from 60 thousand to 200 thousand, in an attempt to increase coverage. The number of observations was limited to three to avoid bias. The cola beverage was chosen as a variable in order to avoid missing values. Due to high popularity, the assumption was that, Cola is available almost anywhere in some shape or form. In addition, no distinction was made between nominal brands of cola (e.g. Pepsi-Cola vs. Coca-Cola). In order to manage the geographic restrictions and the limited opening hours, a binary variable was selected. The variable measures if the observed restaurant serves pizza only or has additional items on the menu (e.g. pasta, soup, non-Italian cuisine, etc.). In case of further research, the variable can be used as a conditioning variable, to explore correlation between it and other variables. The main challenges faced during the collection of the data are listed below: 
+
+* Some of the restaurants don’t have an online presence, which makes it harder to record observations and thus increases the chance of incomplete coverage. 
+* Most of the places don’t have a uniform menu features, meaning some of the places don’t indicate the pizza size while others don’t have cola on the menu. This resulted in missing values for some observations. 
+* Due to the pandemic and geographic restrictions, the available variable pool was decreased. For example, there was no opportunity to visit all of the restaurants and actually try the pizza, thus qualitative variables such as taste, crust texture, etc. were not available for analysis.  
+
+```{r setup, include=FALSE}
+pacman::p_load(pacman, dplyr, GGally, ggplot, ggplot2, ggthemes,
+               ggvis, httr, lubridate, plotly, rio, rmarkdown, shiny,
+               stringr, tidyr, moments)
+library(tidyverse)
+library(xtable)
+library(ggplot2)
+data_in <- "/Users/steve_j/Downloads"
+rest_data <- read.csv(paste0(data_in,"/pizza_restaurants_raw.csv"))
+rest_data <- rename(rest_data,
+                    margherita_price = `Margherita.Price..HUF.`,
+                    pizza_only = `Pizza.only..binary.`,
+                    cola_price = `X0.5L.Cola.Price..HUF.`,
+                    online_rating = `Online.rating`,
+                    distance = `Distance.to.CEU..KM.`)
+
+rest_data$online_rating <- as.double(gsub(",", ".", gsub("\\.", "", rest_data$online_rating))) 
+rest_data$distance <- as.double(gsub(",", ".", gsub("\\.", "", rest_data$distance)))
+
+
+f_rest_data <- filter(rest_data,!is.na(cola_price))
+rest_summary <- f_rest_data %>%  summarise(
+      mean = mean( margherita_price ),
+      median = median( margherita_price ),
+      sd = sd( margherita_price  ),
+      min = min( margherita_price ),
+      max = max( margherita_price ),
+      iq_range = IQR( margherita_price ),
+      skew = skewness(margherita_price),
+      numObs = sum( !is.na( margherita_price )))
+
+summary(f_rest_data$cola_price )
+
+# COMPUTE SUMMARY STATISTICS FOR 'cola_price'
+cola_stat <- f_rest_data %>% summarise( 
+  mean = mean( cola_price ),
+  median = median( cola_price ),
+  sd = sd( cola_price  ),
+  min = min( cola_price ),
+  max = max( cola_price ),
+  iq_range = IQR( cola_price ),
+  skew = ((mean(cola_price)-median(cola_price))/sd(cola_price)),
+  numObs = sum( !is.na( cola_price )) )
+
+# format the table and print
+xt_cola <- xtable(cola_stat,caption = "Summary Table: Cola Prices",align='llccccccc', digits = c(2,0,2,0,0,0,0,3,0))
+names(xt_cola) <- c('Mean','Median','Std.dev.','Min','Max','IQ range','Skewness', 'Observations' )
+print(xt_cola, type = "latex", comment = getOption("xtable.comment", FALSE))
+
+
+xt_pizza <- xtable(rest_summary,caption = "Summary Table: Margherita Prices",align='llccccccc', digits = c(2,0,2,0,0,0,0,3,0))
+names(xt_pizza) <- c('Mean','Median','Std.dev.','Min','Max','IQ range','Skewness', 'Observations' )
+print(xt_pizza, type = "latex", comment = getOption("xtable.comment", FALSE))
+
+
+# JOIN SUMMARY STATISTICS TABLES FOR 'margherita_price' & 'cola_price'
+stat_table <- xt_pizza %>% add_row( xt_cola )
+stat_table
+```
+
+# Descriptive Statistics for Margherita and Cola Prices in Hungary 
+
+```{r, echo=FALSE, warning=F, message=F, warning=FALSE}
+library(knitr)
+kable(stat_table [1:2, ], caption = "Summmary Statistics for Margherita (1) and Cola (2)") 
+```
+
+# Price Distributions 
+
+```{r, echo=FALSE, warning=F, message=F, warning=FALSE, figures-side, fig.show="hold", out.width="50%", fig.height=3}
+par(mar = c(4, 4, .1, .1))
+f_rest_data %>%
+  ggplot(aes(x=cola_price)) +
+  geom_histogram()+
+  theme_gray()+
+  labs(x= "Price", y= "Frequency", title = "Figure 1.1 Cola Price Distribution")
+
+par(mar = c(4, 4, .1, .1))
+f_rest_data %>%
+  ggplot(aes(x = margherita_price)) +
+  geom_histogram()+
+  theme_gray()+
+  labs(x= "Price", y="Frequency", title = "Figure 1.2 Margherita Pizza Price Distribution")
+```
+
+# Figure 2.1 Price Distributions Conditioned on Region 
+
+```{r, echo=FALSE, warning=F, message=F, warning=FALSE}
+par(mfrow = c(3, 1)) 
+hist(f_rest_data$margherita_price [f_rest_data$Region == "Capital"],
+      xlim = c(0, 2500),
+      main = "Distribution of Margherita Prices in the Capital",
+      xlab = "Price in HUF",
+      col = "#83BFFF")
+     
+hist(f_rest_data$margherita_price [f_rest_data$Region == "Countryside"],
+       xlim = c(0, 2500),
+       main = "Distribution of Margherita Prices in the Countryside",
+       xlab = 'Price in HUF',
+       col = "#FF8784")
+```
+
+```{r, echo=FALSE, include=FALSE}
+testing <- f_rest_data %>% 
+   select(Region, margherita_price) %>% 
+   group_by(Region) %>% 
+   summarise(mean_margherita_price = mean(margherita_price),
+             se_margherita_price =1/sqrt(n())*sd(margherita_price),
+             num_obs=n())
+ testing <- mutate(testing, t_stat=mean_margherita_price / se_margherita_price)
+ testing 
+```
+\vspace*{-4cm}
+# Statistical Test Results 
+
+```{r, echo=FALSE, warning=F, message=F, fig.align="center",  fig.show="hold"}
+library(knitr)
+kable(testing [1:2, ], caption = "Test Results ") 
+```
+We could conclude based on the t-stats that the average price of margherita pizza in the capital and in the countryside is not the same. The t-stats are over 2, therefore we could reject that the prices are the same.
+
+# Summary 
+
+The Capital distribution of prices covers more of the higher values and it is more spread out than the Countryside distribution of prices. The pizza prices in the Capital tend to be higher than in the Countryside.
+
+
+
+
+
